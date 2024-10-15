@@ -72,10 +72,31 @@ void normal_cell_print(plateau_t* p, int line, int row, int slice){
         }
     }
     if (slice == 2){
+        if (board_height(p,line,row) == 0){
+            printf("|   |");
+        }
         if(board_height(p,line,row) == 1){
             char team = board_top(p,line,row);
-            printf("|%c%c%c|",(team  + 0x20),(team  + 0x20),(team  + 0x20));
-        }        
+            printf("|%c%c%c|",(team),(team,(team));
+        }    
+        if(board_height(p,line,row) == 2){
+            char team = board_peek(p,line,row,1);
+            printf("| %c |",(team ));
+        }  
+        if(board_height(p,line,row) == 3){
+            char team1 = board_peek(p,line,row,1);
+            char team2 = board_peek(p,line,row,2);
+            printf("|%c %c|",(team1),(team2);
+        }  
+        if(board_height(p,line,row) == 4){
+            char team1 = board_peek(p,line,row,1);
+            char team2 = board_peek(p,line,row,2);
+            char team3 = board_peek(p,line,row,3);
+            printf("|%c%c%c|",(team1),(team2), (team3));
+        } 
+    }
+    if (slice == 3){
+        printf(" ___ ")
     }
 }
 
