@@ -1,5 +1,6 @@
 #ifndef MAIN_H
 #define MAIN_H
+#include <stdbool.h>
 #include "resizableCharArray.h"
 
 
@@ -7,6 +8,7 @@ struct case_s{
     int ligne;
     int colonne; 
     int nb_herisson;
+    bool is_piege;
     rca_t * herissons;
 
 };
