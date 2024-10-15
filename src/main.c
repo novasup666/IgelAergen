@@ -79,6 +79,9 @@ void normal_cell_print(plateau_t* p, int line, int row, int slice){
     }
 }
 
+void trapped_cell_print(plateau_t* p, int line, int row, int slice){
+    
+}
 
 void cell_print(plateau_t* p, int line, int row, int slice){
     if ((p.cases[line][rox])->is_piege){
