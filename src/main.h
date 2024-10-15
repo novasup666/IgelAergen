@@ -7,7 +7,7 @@ struct case_s{
     int ligne;
     int colonne; 
     int nb_herisson;
-    rac_t herissons;
+    rca_t * herissons;
 
 };
 typedef struct case_s case_t;
