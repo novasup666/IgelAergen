@@ -37,7 +37,7 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
 }
 
 void board_push(plateau_t* p, int line, int row, char ctn){
-    push_rca(p->cases[line][row]->herissons,ctn);
+    push_rca(p->cases[line][row])->herissons,ctn);
 }
 
 char board_pop(plateau_t* p, int line, int row){
@@ -56,12 +56,11 @@ char board_peek(plateau_t*p, int line, int row, int pos){
     peek_rca(p->cases[line][row]->herissons,pos);
 }
 
-void initialiser_partie(plateau_t* p, int nb_joueurs, int){
+void initialiser_partie(plateau_t* p, int nb_joueurs, int nb_herrisons_par_joueurs){
 
 }
 
 
-//TODO écrire un scanf correcte qui fail si ce n'est pas un entier !
 int** demander_info_partie(){
     int nb_joueurs;
     printf("Nombre de joueurs:\n>");
@@ -69,7 +68,7 @@ int** demander_info_partie(){
         printf("Erreur, veuillez indiquer un nombre positif!\n");
     }
 
-    printf("nombre de joueurs: %d", nb_joueurs);
+    int*
     return NULL;
 }
 

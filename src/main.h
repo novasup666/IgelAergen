@@ -16,6 +16,8 @@ typedef struct case_s case_t;
 struct plateau_s{
     int nb_lignes;
     int nb_colonnes;
+    int nb_joueurs;
+    int nb_herrisons_par_joueurs;
     case_t** cases;
 };
 typedef struct plateau_s plateau_t;
