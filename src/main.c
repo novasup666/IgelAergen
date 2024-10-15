@@ -4,6 +4,8 @@
 #include "resizableCharArray.h"
 #include "util.h"
 
+
+#define TAILLE_MAX_ENTIER 10
 //gère la logique du jeu 
 
 // /!\ ON STOCKERA DES MINUSCULES !!!!!!
@@ -96,14 +98,39 @@ void initialiser_partie(plateau_t* p, int nb_joueurs, int nb_herrisons_par_joueu
 }
 
 
+
 int** demander_info_partie(){
     int nb_joueurs;
     printf("Nombre de joueurs (max 27):\n>");
-    while((nb_joueurs = readInt(10)) == 0 && nb_joueurs <= 27){
+    while((nb_joueurs = readInt(10)) <= 0 && nb_joueurs <= 27){
         printf("Erreur, veuillez indiquer un nombre positif!\n");
     }
 
-    return NULL;
+    int nb_herrisons_par_joueurs;
+    printf("Nombre d'herissons par joueurs (max 99):\n>");
+    while((nb_herrisons_par_joueurs = readInt(10)) <= 0){
+        printf("Erreur, veuillez indiquer un nombre positif!\n");
+    }
+
+    //info va être un tableau 2D qui contient à la case i les positions des hérissons du joueurs i
+    int **info = malloc(sizeof(int)*nb_joueurs);
+    for(int i = 0; i<nb_joueurs; i++){
+        info[i] = malloc(sizeof(int)*nb_herrisons_par_joueurs);
+    }
+    
+    for(int joueur = 0; joueur < nb_joueurs; joueur++){
+        printf("=========================================================");
+        printf("\nJoueurs %d: Vous allez placer vos herissons de depart !\n", joueur);
+        for(int herisson = 0; herisson<nb_herrisons_par_joueurs; herisson++){
+            printf("Placer le herisson %d:\n>", herisson);
+            int c;
+            while((c=readInt(TAILLE_MAX_ENTIER)) <0){
+                printf("Erreur, joueur %d, veuillez indiquer un nombre positif !\n", joueur);
+            }
+            info[joueur][herisson]=c;
+        }
+    }
+    return info;
 }
 
 int main(){
