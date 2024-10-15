@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "main.h"
 #include "resizableCharArray.h"
-
+#include "util.h"
 
 //gère la logique du jeu 
 
@@ -65,8 +65,8 @@ void initialiser_partie(plateau_t* p, int nb_joueurs, int){
 int** demander_info_partie(){
     int nb_joueurs;
     printf("Nombre de joueurs:\n>");
-    while(scanf("%d", &nb_joueurs) == EOF){
-        printf("Erreur, veuillez indiquer un nombre !\n");
+    while(readInt("%d", &nb_joueurs) == 0){
+        printf("Erreur, veuillez indiquer un nombre positif!\n");
     }
 
     printf("nombre de joueurs: %d", nb_joueurs);
