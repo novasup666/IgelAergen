@@ -8,7 +8,7 @@
 #define row = 3
 #define columns = 3
 #define hedgehogPerTeam = 2
-#define nOfTeam 
+#define nOfTeam
 
 
 case_t* creer_case(int ligne, int colonne, int nb_herissons, char* herissons){

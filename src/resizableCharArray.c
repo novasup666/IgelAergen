@@ -43,3 +43,5 @@ void liberer_rca(rca_t*rca){
     free(rca->tab);
     free(rca);
 }
+
+int main (void){return 0;}
