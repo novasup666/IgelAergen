@@ -5,10 +5,7 @@
 
 
 //gère la logique du jeu 
-#define row 3
-#define columns 3
-#define hedgehogPerTeam 2
-#define nOfTeam 2
+
 
 
 case_t* creer_case(int ligne, int colonne, int nb_herissons, char* herissons){
