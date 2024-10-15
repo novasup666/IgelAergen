@@ -3,9 +3,14 @@
 #include "main.h"
 
 //gère la logique du jeu 
+#define row = 3
+#define columns = 3
+#define hedgehogPerTeam = 2
+#define nOfTeam 
+
 
 case_t* creer_case(int ligne, int colonne, int nb_herrisons, char* herrisons){
-    char* h = malloc(sizeof(char)*nb_herrisons);
+    char* h = malloc(sizeof(char)*hedgehogPerTeam*nOfTeam);
     for(int i=0; i<nb_herrisons; i++){
         h[i] = herrisons[i];
     }

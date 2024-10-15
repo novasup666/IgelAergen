@@ -13,7 +13,7 @@ typedef struct case_s case_t;
 struct plateau_s{
     int nb_lignes;
     int nb_colonnes;
-    case_t* case_t;
+    case_t** cases;
 };
 typedef struct plateau_s plateau_t;
 
