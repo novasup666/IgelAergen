@@ -22,4 +22,10 @@ struct plateau_s{
 };
 typedef struct plateau_s plateau_t;
 
+struct info_partie_s{
+    int nb_joueurs;
+    int nb_herissons_par_joueurs;
+    int** placement_herissons;
+};
+typedef struct info_partie_s info_partie_t;
 #endif

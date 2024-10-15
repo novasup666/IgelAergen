@@ -4,7 +4,7 @@
 #include "resizableCharArray.h"
 #include "util.h"
 
-
+//définit la taille du buffer pour les entiers
 #define TAILLE_MAX_ENTIER 10
 //gère la logique du jeu 
 
@@ -67,19 +67,19 @@ void cell_print(plateau_t* p, int line, int row, int slice){
     char lb;
     char rb;
     char bot;
-    if((p->cases[line][row])->is_piege){
-        top = "V";
-        lb = ">";
-        rb = "<";
-        bot= "^"
+    if((p->cases[line][row]).is_piege){
+        top = 'V';
+        lb = '>';
+        rb = '<';
+        bot= '^';
     }else{
-        top = "_";
-        lb = "|";
-        rb = "|";
-        bot= "_"
+        top = '_';
+        lb = '|';
+        rb = '|';
+        bot= '_';
     }
     if (slice == 0){
-        printf(" %c%c%c "top,top,top);
+        printf(" %c%c%c ", top,top,top);
     }
     if (slice == 1){
         if (board_height(p,line,row) == 0){
@@ -120,6 +120,7 @@ void cell_print(plateau_t* p, int line, int row, int slice){
     
 }
 
+//un joueur est représenté par un entier entre 0 et 26 et un hérisson par une lettre minuscule entre a et z
 char player_to_herisson(int joueur){
     return joueur + 'a';
 }
@@ -128,21 +129,24 @@ int herisson_to_player(char herisson){
     return herisson - 'a';
 }
 
-void initialiser_partie(plateau_t* p, int lignes, int colonnes, int nb_joueurs, int nb_herrisons_par_joueurs, int** placement_herissons){
+plateau_t* initialiser_partie(int lignes, int colonnes, info_partie_t* info){
     plateau_t *p = creer_plateau(lignes, colonnes);
-    p->nb_joueurs = nb_joueurs;
-    p->nb_herrisons_par_joueurs = nb_herrisons_par_joueurs;
+    p->nb_joueurs = info->nb_joueurs;
+    p->nb_herrisons_par_joueurs = info->nb_herissons_par_joueurs;
     //place les herissons correctements sur la 1er ligne
-    for(int joueur = 0; joueur < nb_joueurs; joueur++){
-        for(int herisson = 0; herisson<nb_herrisons_par_joueurs; herisson++){
-            board_push(p, 0, placement_herissons[joueur][herisson], player_to_herisson(joueur));
+    for(int joueur = 0; joueur < info->nb_joueurs; joueur++){
+        for(int herisson = 0; herisson < info->nb_herissons_par_joueurs; herisson++){
+            board_push(p, 0, info->placement_herissons[joueur][herisson], player_to_herisson(joueur));
         }
     }
+    return p;
 }
 
 
 //todo couper ça en 3 fonctions ou bien utiliser une struct
-int** demander_info_partie(){
+info_partie_t* demander_info_partie(){
+    info_partie_t* info = malloc(sizeof(info_partie_t));
+    
     int nb_joueurs;
     printf("Nombre de joueurs (max 27):\n>");
     while((nb_joueurs = readInt(10)) <= 0 && nb_joueurs <= 27){
@@ -156,9 +160,9 @@ int** demander_info_partie(){
     }
 
     //info va être un tableau 2D qui contient à la case i les positions des hérissons du joueurs i
-    int **info = malloc(sizeof(int)*nb_joueurs);
+    int **placement_herisson = malloc(sizeof(int)*nb_joueurs);
     for(int i = 0; i<nb_joueurs; i++){
-        info[i] = malloc(sizeof(int)*nb_herrisons_par_joueurs);
+        placement_herisson[i] = malloc(sizeof(int)*nb_herrisons_par_joueurs);
     }
     
     for(int joueur = 0; joueur < nb_joueurs; joueur++){
@@ -170,13 +174,16 @@ int** demander_info_partie(){
             while((c=readInt(TAILLE_MAX_ENTIER)) <0){
                 printf("Erreur, joueur %d, veuillez indiquer un nombre positif !\n", joueur);
             }
-            info[joueur][herisson]=c;
+            placement_herisson[joueur][herisson]=c;
         }
     }
+    info->nb_joueurs = nb_joueurs;
+    info->nb_herissons_par_joueurs = nb_herrisons_par_joueurs;
+    info->placement_herissons = placement_herisson;
     return info;
 }
 
 int main(){
-    int** info = demander_info_partie();
+    info_partie_t* info = demander_info_partie();
     return 0;
 }
