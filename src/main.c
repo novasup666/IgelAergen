@@ -11,18 +11,18 @@
 #define nOfTeam 
 
 
-case_t* creer_case(int ligne, int colonne, int nb_herrisons, char* herrisons){
+case_t* creer_case(int ligne, int colonne, int nb_herissons, char* herissons){
 
     rca_t * h = creer_rca(4); //C'est arbitraire, changera de taille au besoin
 
-    for(int i=0; i<nb_herrisons; i++){
+    for(int i=0; i<nb_herissons; i++){
         push_rca(h,herissons[i]);
     }
 
     case_t* c = malloc(sizeof(case_t));
     c->ligne = ligne;
     c->colonne = colonne;
-    c->nb_herisson = nb_herrisons;
+    c->nb_herisson = nb_herissons;
     c->herissons = h;
     return c;
 }
@@ -31,19 +31,34 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
     plateau_t *p = malloc(sizeof(plateau_t));
     p->nb_lignes = nb_lignes;
     p->nb_colonnes = nb_colonnes;
-    p->cases = malloc(sizeof(case_t)*lignes*colonne)
-    for(int i = 0; i< lignes*colonnes; i++){
+    p->cases = malloc(sizeof(case_t)*nb_lignes*nb_colonnes);
+    for(int i = 0; i< nb_lignes*nb_colonnes; i++){
         int ligne = i/nb_colonnes;
         int colonne = i%nb_lignes;
-        p->cases[i] = creer_case(ligne, colonne, 0, void); //TODO changer void en le bon argument
+        p->cases[i] = creer_case(ligne, colonne, 0, NULL); //TODO changer void en le bon argument
     }
 
     return p;
 }
 
+void initialiser_partie(plateau_t* p, int nb_joueurs, int){
 
+}
+
+
+//TODO écrire un scanf correcte qui fail si ce n'est pas un entier !
+int** demander_info_partie(){
+    int nb_joueurs;
+    printf("Nombre de joueurs:\n>");
+    while(scanf("%d", &nb_joueurs) == EOF){
+        printf("Erreur, veuillez indiquer un nombre !\n");
+    }
+
+    printf("nombre de joueurs: %d", nb_joueurs);
+    return NULL;
+}
 
 int main(){
-
+    demander_info_partie();
     return 0;
 }

@@ -9,6 +9,7 @@ struct rca_s{
 };
 
 typedef struct rca_s rca_t;
+rca_t* creer_rca(int taille);
 
 void push_rca(rca_t *rca,char valeur);
 char pop_rca(rca_t*rca);
