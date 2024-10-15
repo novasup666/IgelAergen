@@ -93,12 +93,28 @@ void cell_print(plateau_t* p, int line, int row, int slice){
     
 }
 
-void initialiser_partie(plateau_t* p, int nb_joueurs, int nb_herrisons_par_joueurs){
+char player_to_herisson(int joueur){
+    return joueur + 'a';
+}
 
+int herisson_to_player(char herisson){
+    return herisson - 'a';
+}
+
+void initialiser_partie(plateau_t* p, int lignes, int colonnes, int nb_joueurs, int nb_herrisons_par_joueurs, int** placement_herissons){
+    plateau_t *p = creer_plateau(lignes, colonnes);
+    p->nb_joueurs = nb_joueurs;
+    p->nb_herrisons_par_joueurs = nb_herrisons_par_joueurs;
+    //place les herissons correctements sur la 1er ligne
+    for(int joueur = 0; joueur < nb_joueurs; joueur++){
+        for(int herisson = 0; herisson<nb_herrisons_par_joueurs; herisson++){
+            board_push(p, 0, placement_herissons[joueur][herisson], player_to_herisson(joueur));
+        }
+    }
 }
 
 
-
+//todo couper ça en 3 fonctions ou bien utiliser une struct
 int** demander_info_partie(){
     int nb_joueurs;
     printf("Nombre de joueurs (max 27):\n>");
@@ -134,6 +150,6 @@ int** demander_info_partie(){
 }
 
 int main(){
-    demander_info_partie();
+    int** info = demander_info_partie();
     return 0;
 }
