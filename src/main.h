@@ -7,7 +7,6 @@
 struct case_s{
     int ligne;
     int colonne; 
-    int nb_herisson;
     bool is_piege;
     rca_t * herissons;
 

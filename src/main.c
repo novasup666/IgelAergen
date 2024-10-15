@@ -10,8 +10,7 @@
 
 case_t* creer_case(int ligne, int colonne, int nb_herissons, char* herissons){
 
-    rca_t * h = creer_rca(4); //C'est arbitraire, changera de taille au besoin
-
+    rca_t * h = creer_rca(nb_herissons); 
     for(int i=0; i<nb_herissons; i++){
         push_rca(h,herissons[i]);
     }
@@ -19,7 +18,6 @@ case_t* creer_case(int ligne, int colonne, int nb_herissons, char* herissons){
     case_t* c = malloc(sizeof(case_t));
     c->ligne = ligne;
     c->colonne = colonne;
-    c->nb_herisson = nb_herissons;
     c->herissons = h;
     return c;
 }
@@ -39,7 +37,7 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
 }
 
 void board_push(plateau_t* p, int line, int row, char ctn){
-    push_rca(p->cases[line][row],ctn);
+    push_rca(p->cases[line][row]->herissons,ctn);
 }
 
 char board_pop(plateau_t* p, int line, int row){
