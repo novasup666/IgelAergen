@@ -34,6 +34,11 @@ char pop_rca(rca_t*rca){
     return rca->tab[rca->size];
 }
 
+char peek_rca(rca_t*rca){
+    return rca->tab[rca->size-1];
+}
+
+
 void liberer_rca(rca_t*rca){
     free(rca->tab);
     free(rca);
