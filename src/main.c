@@ -53,6 +53,14 @@ int board_height(plateau_t*p, int line, int row){
     return(p->cases[line][row])->size;
 }
 
+char board_top (plateau_t*p, int line, int row){
+    peek_rca(p->cases[line][row],0)
+}
+
+char board_peek(plateau_t*p, int line, int row, int pos){
+    peek_rca(p->cases[line][row],pos)
+}
+
 void initialiser_partie(plateau_t* p, int nb_joueurs, int){
 
 }

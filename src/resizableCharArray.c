@@ -34,8 +34,8 @@ char pop_rca(rca_t*rca){
     return rca->tab[rca->size];
 }
 
-char peek_rca(rca_t*rca){
-    return rca->tab[rca->size-1];
+char peek_rca(rca_t*rca, int pos){
+    return rca->tab[rca->size-(1+pos)];
 }
 
 
