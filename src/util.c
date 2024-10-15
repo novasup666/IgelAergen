@@ -2,6 +2,20 @@
 #include <stdio.h>
 
 
+
+int atoiv2(char* str){
+    int resultat = 0;
+    while(*str != '\0'){
+        if(*str < '0' || *str > '9'){
+            return -1;
+        }
+        resultat *=10;
+        resultat+= *str-'0';
+        str++;
+    }
+    return resultat;
+}
+
 //renvoie la valeur si c'est correcte, -1 si NaN -2 si il y a un depassement de capacité et -3  si EOF
 int readInt(int size){
     char buffer[size];
@@ -20,11 +34,6 @@ int readInt(int size){
     if(n==size){
         return -2; //depassement de capacité
     }
-
-    int value = atoi(buffer);
-    if(value == 0){
-        //atoi returns 0 if NaN
-        return -1;
-    }
-    return value;
+    
+    return atoiv2(value);
 }
