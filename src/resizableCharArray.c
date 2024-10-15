@@ -29,7 +29,7 @@ void push_rca(rca_t *rca,char valeur){
 }
 
 
-void pop_rca(rca_t*rca){
+char pop_rca(rca_t*rca){
     rca->size --;
     return rca->tab[rca->size];
 }
