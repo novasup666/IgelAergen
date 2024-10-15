@@ -56,6 +56,11 @@ char board_peek(plateau_t*p, int line, int row, int pos){
     peek_rca((p->cases[line][row]).herissons,pos);
 }
 
+
+void cell_print(board_t* b, int line, int row, int slice){
+    
+}
+
 void initialiser_partie(plateau_t* p, int nb_joueurs, int nb_herrisons_par_joueurs){
 
 }
