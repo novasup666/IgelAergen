@@ -49,6 +49,10 @@ char board_pop(plateau_t* p, int line, int row){
     pop_rca(p->cases[line][row])
 }
 
+int board_height(plateau_t*p, int line, int row){
+    return(p->cases[line][row])->size;
+}
+
 void initialiser_partie(plateau_t* p, int nb_joueurs, int){
 
 }
