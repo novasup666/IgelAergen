@@ -37,23 +37,23 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
 }
 
 void board_push(plateau_t* p, int line, int row, char ctn){
-    push_rca(p->cases[line][row])->herissons,ctn);
+    push_rca((p->cases[line][row]).herissons,ctn);
 }
 
 char board_pop(plateau_t* p, int line, int row){
-    pop_rca(p->cases[line][row]->herissons);
+    pop_rca((p->cases[line][row]).herissons);
 }
 
 int board_height(plateau_t*p, int line, int row){
-    return(p->cases[line][row]->herissons)->size;
+    return((p->cases[line][row]).herissons)->size;
 }
 
 char board_top (plateau_t*p, int line, int row){
-    peek_rca(p->cases[line][row]->herissons,0);
+    peek_rca((p->cases[line][row]).herissons,0);
 }
 
 char board_peek(plateau_t*p, int line, int row, int pos){
-    peek_rca(p->cases[line][row]->herissons,pos);
+    peek_rca((p->cases[line][row]).herissons,pos);
 }
 
 void initialiser_partie(plateau_t* p, int nb_joueurs, int nb_herrisons_par_joueurs){
