@@ -25,8 +25,16 @@ case_t* creer_case(int ligne, int colonne, int nb_herrisons, char* herrisons){
     return c;
 }
 
-plateau_t creer_plateau(int lignes, int colonnes){
-    plateau_t p = malloc(sizeof(plateau_t));
+plateau_t creer_plateau(int nb_lignes, int nb_colonnes){
+    plateau_t *p = malloc(sizeof(plateau_t));
+    p->nb_lignes = nb_lignes;
+    p->nb_colonnes = nb_colonnes;
+    p->cases = malloc(sizeof(case_t)*lignes*colonne)
+    for(int i = 0; i< lignes*colonnes; i++){
+        int ligne = i/nb_colonnes;
+        int colonne = i%nb_lignes;
+        p->cases[i] = creer_case(ligne, colonne, 0, void); //TODO changer void en le bon argument
+    }
     
 }
 
