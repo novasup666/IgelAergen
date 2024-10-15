@@ -12,16 +12,18 @@
 
 
 case_t* creer_case(int ligne, int colonne, int nb_herrisons, char* herrisons){
-    //char* h = malloc(sizeof(char)*hedgehogPerTeam*nOfTeam);
-    //for(int i=0; i<nb_herrisons; i++){
-    //    h[i] = herrisons[i];
-    //}
+
+    rca_t * h = creer_rca(4); //C'est arbitraire, changera de taille au besoin
+
+    for(int i=0; i<nb_herrisons; i++){
+        push_rca(h,herissons[i]);
+    }
 
     case_t* c = malloc(sizeof(case_t));
     c->ligne = ligne;
     c->colonne = colonne;
     c->nb_herisson = nb_herrisons;
-    //c->herissons = h;
+    c->herissons = h;
     return c;
 }
 
