@@ -11,4 +11,5 @@ typedef struct rca_s rca_t;
 
 void push_rca(rca_t *rca,char valeur);
 void pop_rca(rca_t*rca);
+void liberer_rca(rca_t*rca);
 #endif
