@@ -41,7 +41,7 @@ void board_push(plateau_t* p, int line, int row, char ctn){
 }
 
 char board_pop(plateau_t* p, int line, int row){
-    pop_rca(p->cases[line][row]->herissons)
+    pop_rca(p->cases[line][row]->herissons);
 }
 
 int board_height(plateau_t*p, int line, int row){
@@ -49,11 +49,11 @@ int board_height(plateau_t*p, int line, int row){
 }
 
 char board_top (plateau_t*p, int line, int row){
-    peek_rca(p->cases[line][row]->herissons,0)
+    peek_rca(p->cases[line][row]->herissons,0);
 }
 
 char board_peek(plateau_t*p, int line, int row, int pos){
-    peek_rca(p->cases[line][row]->herissons,pos)
+    peek_rca(p->cases[line][row]->herissons,pos);
 }
 
 void initialiser_partie(plateau_t* p, int nb_joueurs, int){
