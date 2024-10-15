@@ -1,0 +1,1 @@
+/usr/bin/cc -rdynamic CMakeFiles/prog.dir/src/main.c.o CMakeFiles/prog.dir/src/resizableCharArray.c.o CMakeFiles/prog.dir/src/affichage.c.o -o prog 
