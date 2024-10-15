@@ -6,7 +6,7 @@
 
 //gère la logique du jeu 
 
-
+// /!\ ON STOCKERA DES MINUSCULES !!!!!!
 
 case_t* creer_case(int ligne, int colonne, int nb_herissons, char* herissons){
 
@@ -56,11 +56,36 @@ char board_peek(plateau_t*p, int line, int row, int pos){
     peek_rca((p->cases[line][row]).herissons,pos);
 }
 
-
-void cell_print(board_t* b, int line, int row, int slice){
+void normal_cell_print(plateau_t* p, int line, int row, int slice){
     if (slice == 0){
-        printf(" ___ ")
+        printf(" ___ ");
     }
+    if (slice == 1){
+        if (board_height(p,line,row) == 0){
+            printf("|   |");
+        }
+        else{
+            char team = board_top(p,line,row);
+            printf("|%c%c%c|",(team  + 0x20),(team  + 0x20),(team  + 0x20));
+        }
+    }
+    if (slice == 2){
+        if(board_height(p,line,row) == 1){
+            char team = board_top(p,line,row);
+            printf("|%c%c%c|",(team  + 0x20),(team  + 0x20),(team  + 0x20));
+        }        
+    }
+}
+
+
+void cell_print(plateau_t* p, int line, int row, int slice){
+    if ((p.cases[line][rox])->is_piege){
+        trapped_cell_print(p,line,row,slice);
+    }
+    else {
+        normal_cell_print(p,line,row,slice);
+    }
+    
 }
 
 void initialiser_partie(plateau_t* p, int nb_joueurs, int nb_herrisons_par_joueurs){
