@@ -70,12 +70,11 @@ void initialiser_partie(plateau_t* p, int nb_joueurs, int nb_herrisons_par_joueu
 
 int** demander_info_partie(){
     int nb_joueurs;
-    printf("Nombre de joueurs:\n>");
-    while((nb_joueurs = readInt()) == 0){
+    printf("Nombre de joueurs (max 27):\n>");
+    while((nb_joueurs = readInt(10)) == 0 && nb_joueurs <= 27){
         printf("Erreur, veuillez indiquer un nombre positif!\n");
     }
 
-    int*
     return NULL;
 }
 
