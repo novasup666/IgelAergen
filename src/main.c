@@ -41,6 +41,14 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
     return p;
 }
 
+void board_push(plateau_t* p, int line, int row, char ctn){
+    push_rca(p->cases[line][row],ctn);
+}
+
+char board_pop(plateau_t* p, int line, int row){
+    pop_rca(p->cases[line][row])
+}
+
 void initialiser_partie(plateau_t* p, int nb_joueurs, int){
 
 }
