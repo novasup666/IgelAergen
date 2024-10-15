@@ -1,11 +1,13 @@
 #ifndef MAIN_H
 #define MAIN_H
+#include "resizableCharArray.h"
+
 
 struct case_s{
     int ligne;
     int colonne; 
     int nb_herisson;
-    char* herissons;
+    rac_t herissons;
 
 };
 typedef struct case_s case_t;
