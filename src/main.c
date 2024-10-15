@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "main.h"
-
+#include "resizableCharArray.h"
 //gère la logique du jeu 
 #define row = 3
 #define columns = 3
