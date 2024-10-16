@@ -117,7 +117,12 @@ void cell_print(plateau_t* p, int line, int row, int slice){
         } 
     }
     if (slice == 3){
-        printf(" %c%c%c ",bot,bot,bot);
+        int n = board_height(p,line,row);
+        if (n>1){
+            printf(" %c%d%c ",bot,n,bot);
+        }
+        else{
+        printf(" %c%c%c ",bot,bot,bot);}
     }
     
 }
