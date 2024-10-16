@@ -6,7 +6,11 @@
 #include "util.h"
 
 //définit la taille du buffer pour les entiers
-#define TAILLE_MAX_ENTIER 10
+#define TAILLE_MAX_ENTIER 3 //pour eviter les depassements de capacité
+
+//TODO remplacer ca par la lecture des arguments du main
+#define NB_LIGNES 3
+#define NB_COLONNES 3
 //gère la logique du jeu 
 
 // /!\ ON STOCKERA DES MINUSCULES !!!!!!
@@ -39,9 +43,12 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
     return p;
 }
 
-int de(){
+int lancer_de(){
     return rand()%6 + 1;
 }
+
+
+//ATTENTION, valgrind kiff pas du tout ces fonctions !
 
 void board_push(plateau_t* p, int line, int row, char ctn){
     push_rca((p->cases[line][row]).herissons,ctn);
@@ -157,22 +164,27 @@ plateau_t* initialiser_partie(int lignes, int colonnes, info_partie_t* info){
 info_partie_t* demander_info_partie(){
     info_partie_t* info = malloc(sizeof(info_partie_t));
     
-    int nb_joueurs;
+    int nb_joueurs = -1;
     printf("Nombre de joueurs (max 27):\n>");
-    while((nb_joueurs = readInt(10)) <= 0 && nb_joueurs <= 27){
-        printf("Erreur, veuillez indiquer un nombre positif!\n");
+    while((nb_joueurs = readInt(2)) <= 0 || nb_joueurs > 27){ //ici on utilise 2 car on veut un nombre entre 0 et 27
+        printf("Erreur, veuillez indiquer un nombre entre 1 et 27!\n");
+        printf("Nombre de joueurs (max 27):\n>");
     }
+    printf("Nombre de joueurs: %d\n", nb_joueurs);
 
     int nb_herrisons_par_joueurs;
-    printf("Nombre d'herissons par joueurs (max 99):\n>");
-    while((nb_herrisons_par_joueurs = readInt(10)) <= 0){
+    printf("Nombre d'herissons par joueurs (max 999):\n>");
+    while((nb_herrisons_par_joueurs = readInt(TAILLE_MAX_ENTIER)) <= 0){
         printf("Erreur, veuillez indiquer un nombre positif!\n");
+        printf("Nombre d'herissons par joueurs (max 999):\n>");
+
     }
+    printf("Nombre d'herissons par joueurs: %d\n", nb_herrisons_par_joueurs);
 
     //info va être un tableau 2D qui contient à la case i les positions des hérissons du joueurs i
-    int **placement_herisson = malloc(sizeof(int)*nb_joueurs);
-    for(int i = 0; i<nb_joueurs; i++){
-        placement_herisson[i] = malloc(sizeof(int)*nb_herrisons_par_joueurs);
+    int **placement_herisson = malloc(sizeof(int*)*nb_joueurs); //DEBUG merci valgrind
+    for(int j = 0; j<nb_joueurs; j++){
+        placement_herisson[j] = malloc(sizeof(int)*nb_herrisons_par_joueurs);
     }
     
     for(int joueur = 0; joueur < nb_joueurs; joueur++){
@@ -194,7 +206,7 @@ info_partie_t* demander_info_partie(){
 }
 
 void liberer_case(case_t* c){
-    liberer_rca(c->herissons);
+    liberer_rca(c->herissons); 
     free(c);
 }
 
@@ -205,6 +217,66 @@ void liberer_plateau(plateau_t* p){
         }
     }
     free(p->cases);
+    free(p);
+}
+
+bool is_herisson_traped(plateau_t* p, int joueur, int ligne, int colonne){
+
+}
+
+bool is_herisson_on_case(plateau_t* p, int joueur, int ligne, int colonne){
+    return board_top(p, ligne, colonne) == player_to_herisson(joueur);
+}
+
+int demander_coo_plateau(int joueur, int max, bool is_ligne){
+    int r;
+    bool choix_valide = false;
+    const char* type = is_ligne ? "ligne" : "colonne";
+
+    while(!choix_valide){
+        printf("Choisissez une %s entre 0 et %d:\n>", type, max);
+        r = readInt(TAILLE_MAX_ENTIER);
+        if(r <0){
+            printf("Erreur, veuillez indiquer un nombre positif !\n");
+        }
+        if(r >= max){
+            printf("Erreur, veuillez indiquer un nombre inférieur à %d !\n", max);
+        }
+    }
+}
+
+coo_t* demander_coo(plateau_t *p, int joueur, bool must_have_herisson){
+    int ligne;
+    int colonne;
+    bool choix_valide = false;
+    while(!choix_valide){
+        printf("Le joueur %d: Choisissez un herisson:\n>", joueur);
+        ligne = demander_coo_plateau(joueur, p->nb_lignes, true);
+        colonne = demander_coo_plateau(joueur, p->nb_colonnes, false);
+        if(must_have_herisson && !is_herisson_on_case(p, joueur, ligne, colonne)){
+            printf("Erreur, veuillez indiquer une case où vous avez un herisson!\n");
+        }
+        else{
+            choix_valide = true;
+        }
+    }
+    coo_t *c = malloc(sizeof(coo_t));
+    c->ligne = ligne;
+    c->colonne = colonne;
+    return c;
+}
+
+void demander_info_coup(int joueur){
+    printf("Joueur %d, à vous de jouer !\n", joueur);
+    //on tire le dé
+    int de = lancer_de();
+    printf("Vous avez tiré un %d !\n", de);
+
+
+
+    //on demande au joueur de choisir un herisson
+    
+
 }
 
 
@@ -218,8 +290,15 @@ int main(){
     }
     */
 
+
     info_partie_t* info = demander_info_partie();
-    plateau_t* p = initialiser_partie(5, 5, info);
+
+
+    plateau_t* p = initialiser_partie(NB_LIGNES, NB_COLONNES, info);
+    printf("Plateau initialisé !\n");
+    coo_t* c = demander_coo(p, 0, true);
+    printf("Vous avez choisi la case (%d, %d)\n", c->ligne, c->colonne);
+    free(c);
 
     cell_print(p, 0, 0, 0);
     cell_print(p, 0, 0, 1);

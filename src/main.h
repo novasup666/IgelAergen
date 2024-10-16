@@ -28,4 +28,11 @@ struct info_partie_s{
     int** placement_herissons;
 };
 typedef struct info_partie_s info_partie_t;
+
+
+struct coo_s{
+    int ligne;
+    int colonne;
+};
+typedef struct coo_s coo_t;
 #endif
