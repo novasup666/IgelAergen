@@ -32,7 +32,7 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
     for(int i = 0; i< nb_lignes*nb_colonnes; i++){
         int ligne = i/nb_colonnes;
         int colonne = i%nb_lignes;
-        p->cases[i] = creer_case(ligne, colonne, 0, NULL); //TODO changer void en le bon argument
+        p->cases[i] = creer_case(ligne, colonne, 0, NULL); //TODO changer Null en le bon argument
     }
 
     return p;
@@ -63,8 +63,6 @@ char board_peek(plateau_t*p, int line, int row, int pos){
 
 
 void cell_print(plateau_t* p, int line, int row, int slice){
-    // ne pas oublier les cardinaux en bas des cases
-
     char top;
     char lb;
     char rb;
@@ -190,7 +188,26 @@ info_partie_t* demander_info_partie(){
     return info;
 }
 
+void liberer_case(case_t c){
+    liberer_rca(c->herissons);
+    free(c);
+}
+
+void liberer_plateau(plateau_t*p){
+    for(int i = 0; i<nb_lignes; i++){
+        for(int j = 0; j<nb_colonnes; j++){
+            liberer_case(p->cases[i][j]);
+        }
+    }
+    free(p->cases);
+}
+
+
 int main(){
+    case_t c = creer_case(1,2,3,{'a';'b';'c'});
+    for(int i = 0; i < 4; i++){
+        cell_print(1)
+    }
     info_partie_t* info = demander_info_partie();
     return 0;
 }
