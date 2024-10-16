@@ -153,7 +153,7 @@ plateau_t* initialiser_partie(int lignes, int colonnes, info_partie_t* info){
     //place les herissons correctements sur la 1er ligne
     for(int joueur = 0; joueur < info->nb_joueurs; joueur++){
         for(int herisson = 0; herisson < info->nb_herissons_par_joueurs; herisson++){
-            board_push(p, 0, info->placement_herissons[joueur][herisson], player_to_herisson(joueur));
+            //board_push(p, 0, info->placement_herissons[joueur][herisson], player_to_herisson(joueur));
         }
     }
     return p;
@@ -188,8 +188,8 @@ info_partie_t* demander_info_partie(){
     }
     
     for(int joueur = 0; joueur < nb_joueurs; joueur++){
-        printf("=========================================================");
-        printf("\nJoueurs %d: Vous allez placer vos herissons de depart !\n", joueur);
+        printf("=========================================================\n");
+        printf("Joueurs %d: Vous allez placer vos herissons de depart !\n", joueur);
         for(int herisson = 0; herisson<nb_herrisons_par_joueurs; herisson++){
             printf("Placer le herisson %d:\n>", herisson);
             int c;
@@ -234,21 +234,25 @@ int demander_coo_plateau(int joueur, int max, bool is_ligne){
     const char* type = is_ligne ? "ligne" : "colonne";
 
     while(!choix_valide){
-        printf("Choisissez une %s entre 0 et %d:\n>", type, max);
+        printf("Choisissez une %s entre 0 et %d:\n>", type, max-1);
         r = readInt(TAILLE_MAX_ENTIER);
         if(r <0){
             printf("Erreur, veuillez indiquer un nombre positif !\n");
         }
-        if(r >= max){
-            printf("Erreur, veuillez indiquer un nombre inférieur à %d !\n", max);
+        else if(r >= max){
+            printf("Erreur, veuillez indiquer un nombre inférieur à %d !\n", max-1);
+        }else{
+            choix_valide = true;
         }
     }
+    return r;
 }
 
 coo_t* demander_coo(plateau_t *p, int joueur, bool must_have_herisson){
     int ligne;
     int colonne;
     bool choix_valide = false;
+    printf("=========================================================\n");
     while(!choix_valide){
         printf("Le joueur %d: Choisissez un herisson:\n>", joueur);
         ligne = demander_coo_plateau(joueur, p->nb_lignes, true);
