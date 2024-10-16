@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "resizableCharArray.h"
 
+Exception 
 
 struct case_s{
     int ligne;

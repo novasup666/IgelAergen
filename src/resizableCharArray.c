@@ -12,12 +12,13 @@ rca_t* creer_rca(int taille){
 }
 
 void resize_rca(rca_t*rca){
-    char * nt = malloc(rca->capacity * 2 * sizeof(char));
+    char * nt = malloc((rca->capacity * 2 +1)* sizeof(char));
     for (int i = 0; i < rca->capacity; i++){
         nt[i] = rca->tab[i];
     }
     free(rca->tab);
     rca->tab = nt;
+    rca->capacity = 2 * (rca->capacity) + 1
 }
 
 void push_rca(rca_t *rca,char valeur){
@@ -30,11 +31,13 @@ void push_rca(rca_t *rca,char valeur){
 
 
 char pop_rca(rca_t*rca){
+    assert(rca->size>0);
     rca->size --;
     return rca->tab[rca->size];
 }
 
 char peek_rca(rca_t*rca, int pos){
+    assert(rca->size>0);
     return rca->tab[rca->size-(1+pos)];
 }
 

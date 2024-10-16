@@ -43,7 +43,7 @@ void board_push(plateau_t* p, int line, int row, char ctn){
 }
 
 char board_pop(plateau_t* p, int line, int row){
-    pop_rca((p->cases[line][row]).herissons);
+    return pop_rca((p->cases[line][row]).herissons);
 }
 
 int board_height(plateau_t*p, int line, int row){
@@ -51,11 +51,11 @@ int board_height(plateau_t*p, int line, int row){
 }
 
 char board_top (plateau_t*p, int line, int row){
-    peek_rca((p->cases[line][row]).herissons,0);
+    return peek_rca((p->cases[line][row]).herissons,0);
 }
 
 char board_peek(plateau_t*p, int line, int row, int pos){
-    peek_rca((p->cases[line][row]).herissons,pos);
+    return peek_rca((p->cases[line][row]).herissons,pos);
 }
 
 
@@ -63,6 +63,8 @@ char board_peek(plateau_t*p, int line, int row, int pos){
 
 
 void cell_print(plateau_t* p, int line, int row, int slice){
+    // ne pas oublier les cardinaux en bas des cases
+
     char top;
     char lb;
     char rb;
