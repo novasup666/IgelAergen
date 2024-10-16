@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "main.h"
 #include "resizableCharArray.h"
 #include "util.h"
@@ -38,6 +39,10 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
     return p;
 }
 
+int de(){
+    return rand()%6 + 1;
+}
+
 void board_push(plateau_t* p, int line, int row, char ctn){
     push_rca((p->cases[line][row]).herissons,ctn);
 }
@@ -61,7 +66,7 @@ char board_peek(plateau_t*p, int line, int row, int pos){
 
 
 
-
+//attention faut faire gaffe aux "\n", mais on peu laisser ça à print_plateau
 void cell_print(plateau_t* p, int line, int row, int slice){
     char top;
     char lb;
@@ -87,7 +92,7 @@ void cell_print(plateau_t* p, int line, int row, int slice){
         }
         else{
             char team = board_top(p,line,row);
-            printf("%c%c%c%c%c",lb,(team  + 0x20),(team  + 0x20),(team  + 0x20),rb);
+            printf("%c%c%c%c%c",lb,(team  - 0x20),(team  - 0x20),(team  - 0x20),rb); //attention c'est pas un + mais un - (a-0x20=A)
         }
     }
     if (slice == 2){
@@ -188,15 +193,15 @@ info_partie_t* demander_info_partie(){
     return info;
 }
 
-void liberer_case(case_t c){
+void liberer_case(case_t* c){
     liberer_rca(c->herissons);
     free(c);
 }
 
-void liberer_plateau(plateau_t*p){
-    for(int i = 0; i<nb_lignes; i++){
-        for(int j = 0; j<nb_colonnes; j++){
-            liberer_case(p->cases[i][j]);
+void liberer_plateau(plateau_t* p){
+    for(int i = 0; i<p->nb_lignes; i++){
+        for(int j = 0; j<p->nb_colonnes; j++){
+            liberer_case(p->cases[i*p->nb_colonnes+j]);
         }
     }
     free(p->cases);
@@ -204,10 +209,24 @@ void liberer_plateau(plateau_t*p){
 
 
 int main(){
+    srand(time(NULL)); //initialise le générateur de nombre aléatoire, à appeler une seule fois !
+    
+    /*
     case_t c = creer_case(1,2,3,{'a';'b';'c'});
     for(int i = 0; i < 4; i++){
-        cell_print(1)
+        cell_print()
     }
+    */
+
     info_partie_t* info = demander_info_partie();
+    plateau_t* p = initialiser_partie(5, 5, info);
+
+    cell_print(p, 0, 0, 0);
+    cell_print(p, 0, 0, 1);
+    cell_print(p, 0, 0, 2);
+
+    liberer_plateau(p);
+
+    free(info);
     return 0;
 }

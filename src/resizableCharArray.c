@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 #include "resizableCharArray.h"
 
 
@@ -18,7 +19,7 @@ void resize_rca(rca_t*rca){
     }
     free(rca->tab);
     rca->tab = nt;
-    rca->capacity = 2 * (rca->capacity) + 1
+    rca->capacity = 2 * (rca->capacity) + 1;
 }
 
 void push_rca(rca_t *rca,char valeur){
