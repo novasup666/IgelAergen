@@ -51,23 +51,23 @@ int lancer_de(){
 //ATTENTION, valgrind kiff pas du tout ces fonctions !
 
 void board_push(plateau_t* p, int line, int col, char ctn){
-    push_rca((p->cases[line* (p->nb_lignes) +col])->herissons,ctn);
+    push_rca((p->cases[line* (p->nb_colonnes) +col])->herissons,ctn);
 }
 
 char board_pop(plateau_t* p, int line, int col){
-    return pop_rca((p->cases[line* (p->nb_lignes) +col])->herissons);
+    return pop_rca((p->cases[line* (p->nb_colonnes) +col])->herissons);
 }
 
 int board_height(plateau_t*p, int line, int col){
-    return((p->cases[line* (p->nb_lignes) +col])->herissons)->size;
+    return((p->cases[line* (p->nb_colonnes) +col])->herissons)->size;
 }
 
 char board_top (plateau_t*p, int line, int col){
-    return peek_rca((p->cases[line* (p->nb_lignes) +col])->herissons,0);
+    return peek_rca((p->cases[line* (p->nb_colonnes) +col])->herissons,0);
 }
 
 char board_peek(plateau_t*p, int line, int col, int pos){
-    return peek_rca((p->cases[line* (p->nb_lignes) +col])->herissons,pos);
+    return peek_rca((p->cases[line* (p->nb_colonnes) +col])->herissons,pos);
 }
 
 
@@ -79,7 +79,7 @@ void cell_print(plateau_t* p, int line, int col, int slice){
     char lb;
     char rb;
     char bot;
-    if((p->cases[line* (p->nb_lignes) +col])->is_piege){
+    if((p->cases[line* (p->nb_colonnes) +col])->is_piege){
         top = 'V';
         lb = '>';
         rb = '<';
@@ -140,17 +140,17 @@ void cell_print(plateau_t* p, int line, int col, int slice){
 
 void board_print(plateau_t * p){
    
-    printf("       START ");
+    printf("        START ");
     for(int i = 0; i<(p->nb_colonnes)-2; i++){
         printf("       ");
     }
     printf("FINISH \n");
-    printf("       ");
+    printf("Adil   ");
     for(int i = 0; i<(p->nb_colonnes); i++){
         printf("  col  ");
     }
     printf("\n");
-    printf("  ACAB ");
+    printf("& Noé  ");
     for(int i = 0; i<(p->nb_colonnes); i++){
         printf("   %d   ", (i));
     }   
