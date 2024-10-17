@@ -1,11 +1,18 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
+#include <stdbool.h>
 #include "resizableCharArray.h"
 
 
+char board_top_debug (rca_t* h){
+    return is_empty_rca(h) ? 0 : peek_rca(h, 0);
+}
+
+
 rca_t* creer_rca(int taille){
-    rca_t * res = malloc(sizeof(rca_t));
-    char*t = malloc(sizeof(char)*taille);
+    rca_t * res = calloc(1, sizeof(rca_t));
+    char*t = calloc(taille, sizeof(char));
     res->size = 0;
     res->capacity  = taille;
     res->tab = t;
@@ -13,7 +20,7 @@ rca_t* creer_rca(int taille){
 }
 
 void resize_rca(rca_t*rca){
-    char * nt = malloc((rca->capacity * 2 +1)* sizeof(char));
+    char * nt = calloc((rca->capacity * 2 +1), sizeof(char));
     for (int i = 0; i < rca->capacity; i++){
         nt[i] = rca->tab[i];
     }
@@ -37,6 +44,10 @@ char pop_rca(rca_t*rca){
     return rca->tab[rca->size];
 }
 
+bool is_empty_rca(rca_t*rca){
+    return rca->size == 0;
+}
+
 char peek_rca(rca_t*rca, int pos){
     assert(rca->size>pos);
     return rca->tab[rca->size-(1+pos)];
@@ -47,4 +58,3 @@ void liberer_rca(rca_t*rca){
     free(rca->tab);
     free(rca);
 }
-
