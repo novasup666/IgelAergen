@@ -50,36 +50,36 @@ int lancer_de(){
 
 //ATTENTION, valgrind kiff pas du tout ces fonctions !
 
-void board_push(plateau_t* p, int line, int row, char ctn){
-    push_rca((p->cases[line][row]).herissons,ctn);
+void board_push(plateau_t* p, int line, int col, char ctn){
+    push_rca((p->cases[line][col]).herissons,ctn);
 }
 
-char board_pop(plateau_t* p, int line, int row){
-    return pop_rca((p->cases[line][row]).herissons);
+char board_pop(plateau_t* p, int line, int col){
+    return pop_rca((p->cases[line][col]).herissons);
 }
 
-int board_height(plateau_t*p, int line, int row){
-    return((p->cases[line][row]).herissons)->size;
+int board_height(plateau_t*p, int line, int col){
+    return((p->cases[line][col]).herissons)->size;
 }
 
-char board_top (plateau_t*p, int line, int row){
-    return peek_rca((p->cases[line][row]).herissons,0);
+char board_top (plateau_t*p, int line, int col){
+    return peek_rca((p->cases[line][col]).herissons,0);
 }
 
-char board_peek(plateau_t*p, int line, int row, int pos){
-    return peek_rca((p->cases[line][row]).herissons,pos);
+char board_peek(plateau_t*p, int line, int col, int pos){
+    return peek_rca((p->cases[line][col]).herissons,pos);
 }
 
 
 
 
 //attention faut faire gaffe aux "\n", mais on peu laisser ça à print_plateau
-void cell_print(plateau_t* p, int line, int row, int slice){
+void cell_print(plateau_t* p, int line, int col, int slice){
     char top;
     char lb;
     char rb;
     char bot;
-    if((p->cases[line][row]).is_piege){
+    if((p->cases[line][col]).is_piege){
         top = 'V';
         lb = '>';
         rb = '<';
@@ -88,46 +88,46 @@ void cell_print(plateau_t* p, int line, int row, int slice){
         top = '_';
         lb = '|';
         rb = '|';
-        bot= '_';
+        bot= '-';
     }
     if (slice == 0){
         printf("  %c%c%c  ", top,top,top);
     }
     if (slice == 1){
-        if (board_height(p,line,row) == 0){
+        if (board_height(p,line,col) == 0){
             printf(" %c   %c ",lb,rb);
         }
         else{
-            char team = board_top(p,line,row);
+            char team = board_top(p,line,col);
             printf(" %c%c%c%c%c ",lb,(team  - 0x20),(team  - 0x20),(team  - 0x20),rb); //attention c'est pas un + mais un - (a-0x20=A)
         }
     }
     if (slice == 2){
-        if (board_height(p,line,row) == 0){
+        if (board_height(p,line,col) == 0){
             printf(" %c   %c ",lb,rb);
         }
-        if(board_height(p,line,row) == 1){
-            char team = board_top(p,line,row);
+        if(board_height(p,line,col) == 1){
+            char team = board_top(p,line,col);
             printf(" %c%c%c%c%c ",lb,(team),(team),(team),rb);
         }    
-        if(board_height(p,line,row) == 2){
-            char team = board_peek(p,line,row,1);
+        if(board_height(p,line,col) == 2){
+            char team = board_peek(p,line,col,1);
             printf(" %c %c %c ",lb,(team ),rb);
         }  
-        if(board_height(p,line,row) == 3){
-            char team1 = board_peek(p,line,row,1);
-            char team2 = board_peek(p,line,row,2);
+        if(board_height(p,line,col) == 3){
+            char team1 = board_peek(p,line,col,1);
+            char team2 = board_peek(p,line,col,2);
             printf(" %c%c %c%c ",lb,(team1),(team2),rb);
         }  
-        if(board_height(p,line,row) == 4){
-            char team1 = board_peek(p,line,row,1);
-            char team2 = board_peek(p,line,row,2);
-            char team3 = board_peek(p,line,row,3);
+        if(board_height(p,line,col) == 4){
+            char team1 = board_peek(p,line,col,1);
+            char team2 = board_peek(p,line,col,2);
+            char team3 = board_peek(p,line,col,3);
             printf(" %c%c%c%c%c ",lb,(team1),(team2), (team3),rb);
         } 
     }
     if (slice == 3){
-        int n = board_height(p,line,row);
+        int n = board_height(p,line,col);
         if (n>1){
             printf("  %c%d%c  ",bot,n,bot);
         }
@@ -170,7 +170,7 @@ plateau_t* initialiser_partie(int lignes, int colonnes, info_partie_t* info){
     //place les herissons correctements sur la 1er ligne
     for(int joueur = 0; joueur < info->nb_joueurs; joueur++){
         for(int herisson = 0; herisson < info->nb_herissons_par_joueurs; herisson++){
-            //board_push(p, 0, info->placement_herissons[joueur][herisson], player_to_herisson(joueur));
+            board_push(p, 0, info->placement_herissons[joueur][herisson], player_to_herisson(joueur));
         }
     }
     return p;
