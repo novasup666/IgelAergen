@@ -50,13 +50,7 @@ int lancer_de(){
 //ATTENTION ca bug encore
 //TODO remove printf
 void board_push(plateau_t* p, int line, int col, char ctn){
-    printf("A %d %d=========================================================\n", line, col);
-    printf("Debug: (1,3): %c\n", board_top(p, 1, 3));
-    printf("Debug: (0,2) %c\n", board_top(p, 2, 0));
     push_rca((p->cases[line* (p->nb_colonnes) +col])->herissons,ctn); 
-        printf("B=========================================================\n");
-    printf("Debug: (1,3): %c\n", board_top(p, 1, 3));
-    printf("Debug: (0,2) %c\n", board_top(p, 2, 0));
 }
 
 char board_pop(plateau_t* p, int line, int col){
@@ -75,10 +69,6 @@ char board_top (plateau_t*p, int line, int col){
 
 char board_peek(plateau_t*p, int line, int col, int pos){
     return peek_rca((p->cases[line* (p->nb_colonnes) +col])->herissons,pos);
-}
-
-bool board_is_empty(plateau_t*p, int line, int col){
-    return board_top(p, line, col) == 0;
 }
 
 bool board_is_empty(plateau_t*p, int line, int col){
@@ -202,12 +192,7 @@ plateau_t* initialiser_partie(int lignes, int colonnes, info_partie_t* info){
     //place les herissons correctements sur la 1er ligne
     for(int joueur = 0; joueur < info->nb_joueurs; joueur++){
         for(int herisson = 0; herisson < info->nb_herissons_par_joueurs; herisson++){
-            printf("Debug: joueur %d, herisson %d\n", joueur, herisson); //TODO remove comment, mais il confirme que l'erreur de placement n'est pas ici
-            printf("valeur: %d\n", info->placement_herissons[joueur][herisson]);
             board_push(p, info->placement_herissons[joueur][herisson] , 0, player_to_herisson(joueur));
-            printf("=========================================================\n");
-            printf("Debug: (1,3): %c\n", board_top(p, 1, 3));
-            printf("Debug: (0,2) %c\n", board_top(p, 2, 0));
 
         }
     }
@@ -258,7 +243,7 @@ int jouer_coup(plateau_t *p, int joueur){
     
     //on laisse le joueur deplacer un herisson verticalement si il le désire
     bool choix_vertical_valide = false;
-    while(!choix_veritcal_valide){
+    while(!choix_vertical_valide){
         printf("Selectionnez un herisson à déplacer verticalement:\n");
         coo_t* c = demander_coo(p, joueur, true, false);
         if(c==NULL){
@@ -334,22 +319,9 @@ int main(){
 
 
     board_print(p);
-    
-    printf("=========================================================\n");
-    printf("Debug: (1,3): %c\n", board_top(p, 1, 3));
-    printf("Debug: (0,2) %c\n", board_top(p, 2, 0));
+
     
     liberer_plateau(p);
     liberer_info_partie(info);
     return 0;
 }
-
-//TODO y'a un pb
-/*
-Quand on test 
-1 joueur
-1 herisson
-qu'on le met à la ligne 2
-ça affiche 2 herissons en (0,2) et (1,3)
-En revanche il n'y a pas de bug si le plateau est un carré 
-*/

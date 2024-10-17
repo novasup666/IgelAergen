@@ -99,8 +99,8 @@ coo_t* demander_coo(plateau_t *p, int joueur, bool must_have_herisson, bool mand
             return NULL;
         }
 
-        ligne = demander_coo_plateau(joueur, p->nb_lignes, true);
-        colonne = demander_coo_plateau(joueur, p->nb_colonnes, false);
+        ligne = demander_coo_plateau(joueur, p->nb_lignes, true, true);
+        colonne = demander_coo_plateau(joueur, p->nb_colonnes, false, true);
         if(must_have_herisson && !is_herisson_on_case(p, joueur, ligne, colonne)){
             printf("Erreur, veuillez indiquer une case où vous avez un herisson!\n");
             if(!mandatory && !ask_exit_choice(joueur)){ //on repete ça au cas ou le joueur ne peux pas choisir une case avec un de ses herissons, pour eviter qu'il soit bloquer
