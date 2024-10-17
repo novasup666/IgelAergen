@@ -53,28 +53,32 @@ void board_push(plateau_t* p, int line, int col, char ctn){
     printf("A %d %d=========================================================\n", line, col);
     printf("Debug: (1,3): %c\n", board_top(p, 1, 3));
     printf("Debug: (0,2) %c\n", board_top(p, 2, 0));
-    push_rca((p->cases[line* (p->nb_lignes) +col])->herissons,ctn); 
+    push_rca((p->cases[line* (p->nb_colonnes) +col])->herissons,ctn); 
         printf("B=========================================================\n");
     printf("Debug: (1,3): %c\n", board_top(p, 1, 3));
     printf("Debug: (0,2) %c\n", board_top(p, 2, 0));
 }
 
 char board_pop(plateau_t* p, int line, int col){
-    return pop_rca((p->cases[line* (p->nb_lignes) +col])->herissons);
+    return pop_rca((p->cases[line* (p->nb_colonnes) +col])->herissons);
 }
 
 int board_height(plateau_t*p, int line, int col){
-    return((p->cases[line* (p->nb_lignes) +col])->herissons)->size;
+    return((p->cases[line* (p->nb_colonnes) +col])->herissons)->size;
 }
 
 //j'ai changé la spec, ça renvoie 0 si la case est vide
 char board_top (plateau_t*p, int line, int col){
-    rca_t* h = (p->cases[line* (p->nb_lignes) +col])->herissons;
+    rca_t* h = (p->cases[line* (p->nb_colonnes) +col])->herissons;
     return is_empty_rca(h) ? 0 : peek_rca(h, 0);
 }
 
 char board_peek(plateau_t*p, int line, int col, int pos){
-    return peek_rca((p->cases[line* (p->nb_lignes) +col])->herissons,pos);
+    return peek_rca((p->cases[line* (p->nb_colonnes) +col])->herissons,pos);
+}
+
+bool board_is_empty(plateau_t*p, int line, int col){
+    return board_top(p, line, col) == 0;
 }
 
 bool board_is_empty(plateau_t*p, int line, int col){
@@ -90,7 +94,7 @@ void cell_print(plateau_t* p, int line, int col, int slice){
     char lb;
     char rb;
     char bot;
-    if((p->cases[line* (p->nb_lignes) +col])->is_piege){
+    if((p->cases[line* (p->nb_colonnes) +col])->is_piege){
         top = 'V';
         lb = '>';
         rb = '<';
@@ -151,17 +155,17 @@ void cell_print(plateau_t* p, int line, int col, int slice){
 
 void board_print(plateau_t * p){
    
-    printf("       START ");
+    printf("        START ");
     for(int i = 0; i<(p->nb_colonnes)-2; i++){
         printf("       ");
     }
     printf("FINISH \n");
-    printf("       ");
+    printf("Adil   ");
     for(int i = 0; i<(p->nb_colonnes); i++){
         printf("  col  ");
     }
     printf("\n");
-    printf("  ACAB ");
+    printf("& Noé  ");
     for(int i = 0; i<(p->nb_colonnes); i++){
         printf("   %d   ", (i));
     }   
@@ -209,7 +213,6 @@ plateau_t* initialiser_partie(int lignes, int colonnes, info_partie_t* info){
     }
     return p;
 }
-
 
 
 
@@ -323,8 +326,8 @@ int main(){
 
 
     plateau_t* p = initialiser_partie(NB_LIGNES, NB_COLONNES, info);
-    printf("Plateau initialisé !\n");
-    //coo_t* c = demander_coo(p, 0, true, true);
+    printf("\n\n<<<<<<< < < <  <  Plateau initialisé !  >  > > > >>>>>>>\n\n");
+    //coo_t* c = demander_coo(p, 0, true);
     //printf("Vous avez choisi la case (%d, %d)\n", c->ligne, c->colonne);
     //free(c);
     
