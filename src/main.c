@@ -297,12 +297,7 @@ int jouer_coup(plateau_t *p, int joueur){
 int main(){
     srand(time(NULL)); //initialise le générateur de nombre aléatoire, à appeler une seule fois !
     
-    /*
-    case_t c = creer_case(1,2,3,{'a';'b';'c'});
-    for(int i = 0; i < 4; i++){
-        cell_print()
-    }
-    */
+
 
 
     info_partie_t* info = demander_info_partie(NB_LIGNES, NB_COLONNES);
