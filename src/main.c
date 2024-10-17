@@ -76,7 +76,6 @@ bool board_is_empty(plateau_t*p, int line, int col){
 
 
 
-//attention faut faire gaffe aux "\n", mais on peu laisser ça à print_plateau
 void cell_print(plateau_t* p, int line, int col, int slice){
     char top;
     char lb;
@@ -235,14 +234,30 @@ bool is_herisson_last(plateau_t* p, int joueur, int ligne, int colonne){
     return true;
 }
 
+bool is_coup_possible(plateau_t* p, int ligne){
+    for(int i=0; i<p->nb_colonnes; i++){
+        if(!board_is_empty(p, ligne, i)){
+            return true;
+        }
+    }
+    return false;
+}
+
 int jouer_coup(plateau_t *p, int joueur){
+    printf("DEBUG: joueur %d\n", joueur);
     int de = lancer_de();
+    //TODO remove ce fix hideux
+    while(de >= p->nb_lignes){
+        printf("Erreur, le dé a donné un nombre trop grand (%d) pour le nombre de lignes (%d)\n", de, p->nb_lignes);
+        de=lancer_de();
+    }
+
     printf("Le joueur %d a lancé un %d et peu donc faire avancer un herisson de la ligne %d\n", joueur, de, de);
     
     //on laisse le joueur deplacer un herisson verticalement si il le désire
     bool choix_vertical_valide = false;
     while(!choix_vertical_valide){
-        printf("Selectionnez un herisson à déplacer verticalement:\n");
+        printf("Selectionnez un herisson à déplacer verticalement (optionelle):\n");
         coo_t* c = demander_coo(p, joueur, true, false);
         if(c==NULL){
             printf("Joueur %d, vous avez choisi de ne pas déplacer de herisson verticalement\n", joueur);
@@ -273,16 +288,28 @@ int jouer_coup(plateau_t *p, int joueur){
         }
     }
 
-    //TODO: ici on doit input une colonne, vérifier qu'il y a un herisson, et le déplacer 
-    //OU rien input et verifier qu'il n'y a pas de herisson à déplacer sur la ligne du dé
+        board_print(p);
 
-    //le joueur doit ensuite déplacer un herisson horizontalement de la ligne déterminée par le dé
+    //TODO: ici on doit input une colonne, vérifier qu'il y a un herisson, et le déplacer si un coup est possible
+
+    if(!is_coup_possible(p, de)){
+        printf("Joueur %d: vous ne pouvez pas jouer de coup\n", joueur);
+        return 0;
+    }
+
+    //le joueur doit donc déplacer un herisson horizontalement de la ligne déterminée par le dé
     bool choix_horizontal_valide = false;
     while(!choix_horizontal_valide){
-        printf("Joueur %d: Selectionnez un herisson à déplacer horizontalement sur la ligne %d:\n", joueur, de);
-        int colonne = demander_coo_plateau(joueur, p->nb_colonnes, false, true);
-        //on vérifie qu'il y a bien un herisson à déplacer
-        break;
+        printf("Joueur %d: Selectionnez un herisson à déplacer horizontalement sur la ligne %d (ceci est obligatoire pour les ects):\n", joueur, de); //TODO remove la vanne claqué sur les ects
+        int colonne = demander_coo_plateau(joueur, p->nb_colonnes-1, false, true); //on ne veut pas bouger un herisson sur la dernière colonne
+        if(board_is_empty(p, de, colonne)){
+            printf("Erreur, la case (%d, %d) est vide\n", de, colonne);
+        }
+        else{
+            //on déplace le herisson
+            board_push(p, de, colonne+1, board_pop(p, de, colonne));
+            choix_horizontal_valide = true;
+        }
     }
 
 }
@@ -297,7 +324,12 @@ int jouer_coup(plateau_t *p, int joueur){
 int main(){
     srand(time(NULL)); //initialise le générateur de nombre aléatoire, à appeler une seule fois !
     
-
+    /*
+    case_t c = creer_case(1,2,3,{'a';'b';'c'});
+    for(int i = 0; i < 4; i++){
+        cell_print()
+    }
+    */
 
 
     info_partie_t* info = demander_info_partie(NB_LIGNES, NB_COLONNES);
@@ -305,13 +337,16 @@ int main(){
 
     plateau_t* p = initialiser_partie(NB_LIGNES, NB_COLONNES, info);
     printf("\n\n<<<<<<< < < <  <  Plateau initialisé !  >  > > > >>>>>>>\n\n");
+    board_print(p);
+    jouer_coup(p, 0);
+        board_print(p);
+
     //coo_t* c = demander_coo(p, 0, true);
     //printf("Vous avez choisi la case (%d, %d)\n", c->ligne, c->colonne);
     //free(c);
     
 
 
-    board_print(p);
 
     
     liberer_plateau(p);
