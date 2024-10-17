@@ -47,8 +47,6 @@ int lancer_de(){
 }
 
 
-//ATTENTION ca bug encore
-//TODO remove printf
 void board_push(plateau_t* p, int line, int col, char ctn){
     push_rca((p->cases[line* (p->nb_colonnes) +col])->herissons,ctn); 
 }
