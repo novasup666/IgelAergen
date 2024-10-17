@@ -18,7 +18,7 @@ struct plateau_s{
     int nb_colonnes;
     int nb_joueurs;
     int nb_herrisons_par_joueurs;
-    case_t** cases;
+    case_t** cases; //tableau 1D de cases* !!!
 };
 typedef struct plateau_s plateau_t;
 
@@ -28,4 +28,11 @@ struct info_partie_s{
     int** placement_herissons;
 };
 typedef struct info_partie_s info_partie_t;
+
+
+struct coo_s{
+    int ligne;
+    int colonne;
+};
+typedef struct coo_s coo_t;
 #endif
