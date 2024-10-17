@@ -50,17 +50,7 @@ int lancer_de(){
 //ATTENTION ca bug encore
 //TODO remove printf
 void board_push(plateau_t* p, int line, int col, char ctn){
-<<<<<<< HEAD
     push_rca((p->cases[line* (p->nb_colonnes) +col])->herissons,ctn);
-=======
-    printf("A %d %d=========================================================\n", line, col);
-    printf("Debug: (1,3): %c\n", board_top(p, 1, 3));
-    printf("Debug: (0,2) %c\n", board_top(p, 2, 0));
-    push_rca((p->cases[line* (p->nb_lignes) +col])->herissons,ctn); 
-        printf("B=========================================================\n");
-    printf("Debug: (1,3): %c\n", board_top(p, 1, 3));
-    printf("Debug: (0,2) %c\n", board_top(p, 2, 0));
->>>>>>> 06614b6 (avancé sur main partie)
 }
 
 char board_pop(plateau_t* p, int line, int col){
@@ -73,12 +63,8 @@ int board_height(plateau_t*p, int line, int col){
 
 //j'ai changé la spec, ça renvoie 0 si la case est vide
 char board_top (plateau_t*p, int line, int col){
-<<<<<<< HEAD
-    return peek_rca((p->cases[line* (p->nb_colonnes) +col])->herissons,0);
-=======
-    rca_t* h = (p->cases[line* (p->nb_lignes) +col])->herissons;
+    rca_t* h = (p->cases[line* (p->nb_colonnes) +col])->herissons;
     return is_empty_rca(h) ? 0 : peek_rca(h, 0);
->>>>>>> 06614b6 (avancé sur main partie)
 }
 
 char board_peek(plateau_t*p, int line, int col, int pos){
@@ -219,53 +205,6 @@ plateau_t* initialiser_partie(int lignes, int colonnes, info_partie_t* info){
 }
 
 
-<<<<<<< HEAD
-//todo couper ça en 3 fonctions ou bien utiliser une struct
-info_partie_t* demander_info_partie(){
-    info_partie_t* info = malloc(sizeof(info_partie_t));
-    
-    int nb_joueurs = -1;
-    printf("Nombre de joueurs (max 27):\n>");
-    while((nb_joueurs = readInt(2)) <= 0 || nb_joueurs > 27){ //ici on utilise 2 car on veut un nombre entre 0 et 27
-        printf("Erreur, veuillez indiquer un nombre entre 1 et 27!\n");
-        printf("Nombre de joueurs (max 27):\n>");
-    }
-    printf("Nombre de joueurs: %d\n", nb_joueurs);
-    int nb_herrisons_par_joueurs;
-    printf("Nombre d'herissons par joueurs (max 999):\n>");
-    while((nb_herrisons_par_joueurs = readInt(TAILLE_MAX_ENTIER)) <= 0){
-        printf("Erreur, veuillez indiquer un nombre positif!\n");
-        printf("Nombre d'herissons par joueurs (max 999):\n>");
-
-    }
-    printf("Nombre d'herissons par joueurs: %d\n", nb_herrisons_par_joueurs);
-    printf("\n");
-    //info va être un tableau 2D qui contient à la case i les positions des hérissons du joueurs i
-    int **placement_herisson = malloc(sizeof(int*)*nb_joueurs); //DEBUG merci valgrind
-    for(int j = 0; j<nb_joueurs; j++){
-        placement_herisson[j] = malloc(sizeof(int)*nb_herrisons_par_joueurs);
-    }
-    
-    for(int joueur = 0; joueur < nb_joueurs; joueur++){
-        printf("\n=========================================================\n");
-        printf("Joueurs %d: Vous allez placer vos herissons de depart !\n", joueur);
-        for(int herisson = 0; herisson<nb_herrisons_par_joueurs; herisson++){
-            printf("Placer le herisson %d:\n>", herisson);
-            int c;
-            while((c=readInt(TAILLE_MAX_ENTIER)) <0){
-                printf("Erreur, joueur %d, veuillez indiquer un nombre positif !\n", joueur);
-            }
-            placement_herisson[joueur][herisson]=c;
-        }
-    }
-    info->nb_joueurs = nb_joueurs;
-    info->nb_herissons_par_joueurs = nb_herrisons_par_joueurs;
-    info->placement_herissons = placement_herisson;
-    return info;
-}
-=======
-
->>>>>>> 06614b6 (avancé sur main partie)
 
 void liberer_case(case_t* c){
     liberer_rca(c->herissons); 
@@ -377,13 +316,8 @@ int main(){
 
 
     plateau_t* p = initialiser_partie(NB_LIGNES, NB_COLONNES, info);
-<<<<<<< HEAD
     printf("\n\n<<<<<<< < < <  <  Plateau initialisé !  >  > > > >>>>>>>\n\n");
     //coo_t* c = demander_coo(p, 0, true);
-=======
-    printf("Plateau initialisé !\n");
-    //coo_t* c = demander_coo(p, 0, true, true);
->>>>>>> 06614b6 (avancé sur main partie)
     //printf("Vous avez choisi la case (%d, %d)\n", c->ligne, c->colonne);
     //free(c);
     
