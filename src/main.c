@@ -10,7 +10,7 @@
 
 //TODO remplacer ca par la lecture des arguments du main
 #define NB_LIGNES 3
-#define NB_COLONNES 3
+#define NB_COLONNES 5
 //gère la logique du jeu 
 
 // /!\ ON STOCKERA DES MINUSCULES !!!!!!
@@ -51,23 +51,23 @@ int lancer_de(){
 //ATTENTION, valgrind kiff pas du tout ces fonctions !
 
 void board_push(plateau_t* p, int line, int col, char ctn){
-    push_rca((p->cases[line][col]).herissons,ctn);
+    push_rca((p->cases[line* (p->nb_lignes) +col]).herissons,ctn);
 }
 
 char board_pop(plateau_t* p, int line, int col){
-    return pop_rca((p->cases[line][col]).herissons);
+    return pop_rca((p->cases[line* (p->nb_lignes) +col]).herissons);
 }
 
 int board_height(plateau_t*p, int line, int col){
-    return((p->cases[line][col]).herissons)->size;
+    return((p->cases[line* (p->nb_lignes) +col]).herissons)->size;
 }
 
 char board_top (plateau_t*p, int line, int col){
-    return peek_rca((p->cases[line][col]).herissons,0);
+    return peek_rca((p->cases[line* (p->nb_lignes) +col]).herissons,0);
 }
 
 char board_peek(plateau_t*p, int line, int col, int pos){
-    return peek_rca((p->cases[line][col]).herissons,pos);
+    return peek_rca((p->cases[line* (p->nb_lignes) +col]).herissons,pos);
 }
 
 
@@ -79,7 +79,8 @@ void cell_print(plateau_t* p, int line, int col, int slice){
     char lb;
     char rb;
     char bot;
-    if((p->cases[line][col]).is_piege){
+    printf("%d,%d,\n",line,col);
+    if((p->cases[line* (p->nb_lignes) +col]).is_piege){
         top = 'V';
         lb = '>';
         rb = '<';
@@ -95,11 +96,16 @@ void cell_print(plateau_t* p, int line, int col, int slice){
     }
     if (slice == 1){
         if (board_height(p,line,col) == 0){
+            printf("hihi\n");
             printf(" %c   %c ",lb,rb);
+            printf("hihifin\n");
         }
         else{
+            printf("hihi\n");
             char team = board_top(p,line,col);
             printf(" %c%c%c%c%c ",lb,(team  - 0x20),(team  - 0x20),(team  - 0x20),rb); //attention c'est pas un + mais un - (a-0x20=A)
+            printf("hihifin\n");
+
         }
     }
     if (slice == 2){
@@ -138,6 +144,7 @@ void cell_print(plateau_t* p, int line, int col, int slice){
 }
 
 void board_print(plateau_t * p){
+   
     printf("       START ");
     for(int i = 0; i<(p->nb_colonnes)-2; i++){
         printf("       ");
@@ -150,8 +157,20 @@ void board_print(plateau_t * p){
     printf("\n");
     printf("       ");
     for(int i = 0; i<(p->nb_colonnes); i++){
-        printf("   %c   ", (97+i));
+        printf("   %d   ", (i));
     }   
+    printf("\n");
+    for(int i = 0;i<(p->nb_lignes); i++){
+        for(int s = 0; s<4; s++){
+            printf("   %d   ",i);
+            for(int j = 0; j<(p->nb_colonnes); j++){
+                cell_print(p,i,j,s);
+            }
+            printf("\n");
+        }
+
+    }
+    printf("\n");
 }
 
 //un joueur est représenté par un entier entre 0 et 26 et un hérisson par une lettre minuscule entre a et z
@@ -321,16 +340,10 @@ int main(){
     //printf("Vous avez choisi la case (%d, %d)\n", c->ligne, c->colonne);
     //free(c);
 
-    printf("hehe\n");
-    cell_print(p, 0, 0, 0);
-    printf("\n");
-    cell_print(p, 0, 0, 1);
-    printf("\n");
-    cell_print(p, 0, 0, 2);
-    printf("\n");
-    cell_print(p, 0, 0, 3);
-    printf("ahha\n");
+
+    board_print(p);
     liberer_plateau(p);
+
 
     free(info);
     return 0;
