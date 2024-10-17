@@ -117,7 +117,7 @@ coo_t* demander_coo(plateau_t *p, int joueur, bool must_have_herisson, bool mand
     return c;
 }
 
-int demander_depalcement(plateau_t *p, int joueur){
+int demander_deplacement(plateau_t *p, int joueur){
     bool choix_valide = false;
     int deplacement = -1;
     while(deplacement != 1 && deplacement != 2){
