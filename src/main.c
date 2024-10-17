@@ -139,8 +139,19 @@ void cell_print(plateau_t* p, int line, int row, int slice){
 
 void board_print(plateau_t * p){
     printf("       START ");
-    for(int i = 0; i<)
-    printf("       ")
+    for(int i = 0; i<(p->nb_colonnes)-2; i++){
+        printf("       ");
+    }
+    printf("FINISH \n\n");
+    printf("       ");
+    for(int i = 0; i<(p->nb_colonnes); i++){
+        printf("  col  ");
+    }
+    printf("\n");
+    printf("       ");
+    for(int i = 0; i<(p->nb_colonnes); i++){
+        printf("   %c   ", (97+i));
+    }   
 }
 
 //un joueur est représenté par un entier entre 0 et 26 et un hérisson par une lettre minuscule entre a et z
@@ -306,14 +317,19 @@ int main(){
 
     plateau_t* p = initialiser_partie(NB_LIGNES, NB_COLONNES, info);
     printf("Plateau initialisé !\n");
-    coo_t* c = demander_coo(p, 0, true);
-    printf("Vous avez choisi la case (%d, %d)\n", c->ligne, c->colonne);
-    free(c);
+    //coo_t* c = demander_coo(p, 0, true);
+    //printf("Vous avez choisi la case (%d, %d)\n", c->ligne, c->colonne);
+    //free(c);
 
+    printf("hehe\n");
     cell_print(p, 0, 0, 0);
+    printf("\n");
     cell_print(p, 0, 0, 1);
+    printf("\n");
     cell_print(p, 0, 0, 2);
-
+    printf("\n");
+    cell_print(p, 0, 0, 3);
+    printf("ahha\n");
     liberer_plateau(p);
 
     free(info);
