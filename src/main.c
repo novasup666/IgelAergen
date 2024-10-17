@@ -205,7 +205,6 @@ info_partie_t* demander_info_partie(){
         printf("Nombre de joueurs (max 27):\n>");
     }
     printf("Nombre de joueurs: %d\n", nb_joueurs);
-
     int nb_herrisons_par_joueurs;
     printf("Nombre d'herissons par joueurs (max 999):\n>");
     while((nb_herrisons_par_joueurs = readInt(TAILLE_MAX_ENTIER)) <= 0){
@@ -214,7 +213,7 @@ info_partie_t* demander_info_partie(){
 
     }
     printf("Nombre d'herissons par joueurs: %d\n", nb_herrisons_par_joueurs);
-
+    printf("\n");
     //info va être un tableau 2D qui contient à la case i les positions des hérissons du joueurs i
     int **placement_herisson = malloc(sizeof(int*)*nb_joueurs); //DEBUG merci valgrind
     for(int j = 0; j<nb_joueurs; j++){
@@ -222,7 +221,7 @@ info_partie_t* demander_info_partie(){
     }
     
     for(int joueur = 0; joueur < nb_joueurs; joueur++){
-        printf("=========================================================\n");
+        printf("\n=========================================================\n");
         printf("Joueurs %d: Vous allez placer vos herissons de depart !\n", joueur);
         for(int herisson = 0; herisson<nb_herrisons_par_joueurs; herisson++){
             printf("Placer le herisson %d:\n>", herisson);
@@ -333,7 +332,7 @@ int main(){
 
 
     plateau_t* p = initialiser_partie(NB_LIGNES, NB_COLONNES, info);
-    printf("Plateau initialisé !\n");
+    printf("\n\n<<<<<<< < < <  <  Plateau initialisé !  >  > > > >>>>>>>\n\n");
     //coo_t* c = demander_coo(p, 0, true);
     //printf("Vous avez choisi la case (%d, %d)\n", c->ligne, c->colonne);
     //free(c);
