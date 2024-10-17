@@ -108,7 +108,7 @@ void cell_print(plateau_t* p, int line, int col, int slice){
         }
         if(board_height(p,line,col) == 1){
             char team = board_top(p,line,col);
-            printf(" %c%c%c%c%c ",lb,(team),(team),(team),rb);
+            printf(" %c%c%c%c%c ",lb,(team - 0x20),(team - 0x20),(team- 0x20),rb);
         }    
         if(board_height(p,line,col) == 2){
             char team = board_peek(p,line,col,1);
@@ -170,7 +170,7 @@ plateau_t* initialiser_partie(int lignes, int colonnes, info_partie_t* info){
     //place les herissons correctements sur la 1er ligne
     for(int joueur = 0; joueur < info->nb_joueurs; joueur++){
         for(int herisson = 0; herisson < info->nb_herissons_par_joueurs; herisson++){
-            board_push(p, 0, info->placement_herissons[joueur][herisson], player_to_herisson(joueur));
+            board_push(p, info->placement_herissons[joueur][herisson] , 0, player_to_herisson(joueur));
         }
     }
     return p;
