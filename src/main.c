@@ -51,23 +51,23 @@ int lancer_de(){
 //ATTENTION, valgrind kiff pas du tout ces fonctions !
 
 void board_push(plateau_t* p, int line, int col, char ctn){
-    push_rca((p->cases[line* (p->nb_lignes) +col]).herissons,ctn);
+    push_rca((p->cases[line* (p->nb_lignes) +col])->herissons,ctn);
 }
 
 char board_pop(plateau_t* p, int line, int col){
-    return pop_rca((p->cases[line* (p->nb_lignes) +col]).herissons);
+    return pop_rca((p->cases[line* (p->nb_lignes) +col])->herissons);
 }
 
 int board_height(plateau_t*p, int line, int col){
-    return((p->cases[line* (p->nb_lignes) +col]).herissons)->size;
+    return((p->cases[line* (p->nb_lignes) +col])->herissons)->size;
 }
 
 char board_top (plateau_t*p, int line, int col){
-    return peek_rca((p->cases[line* (p->nb_lignes) +col]).herissons,0);
+    return peek_rca((p->cases[line* (p->nb_lignes) +col])->herissons,0);
 }
 
 char board_peek(plateau_t*p, int line, int col, int pos){
-    return peek_rca((p->cases[line* (p->nb_lignes) +col]).herissons,pos);
+    return peek_rca((p->cases[line* (p->nb_lignes) +col])->herissons,pos);
 }
 
 
@@ -79,8 +79,7 @@ void cell_print(plateau_t* p, int line, int col, int slice){
     char lb;
     char rb;
     char bot;
-    printf("%d,%d,\n",line,col);
-    if((p->cases[line* (p->nb_lignes) +col]).is_piege){
+    if((p->cases[line* (p->nb_lignes) +col])->is_piege){
         top = 'V';
         lb = '>';
         rb = '<';
@@ -96,15 +95,11 @@ void cell_print(plateau_t* p, int line, int col, int slice){
     }
     if (slice == 1){
         if (board_height(p,line,col) == 0){
-            printf("hihi\n");
             printf(" %c   %c ",lb,rb);
-            printf("hihifin\n");
         }
         else{
-            printf("hihi\n");
             char team = board_top(p,line,col);
             printf(" %c%c%c%c%c ",lb,(team  - 0x20),(team  - 0x20),(team  - 0x20),rb); //attention c'est pas un + mais un - (a-0x20=A)
-            printf("hihifin\n");
 
         }
     }
@@ -149,20 +144,23 @@ void board_print(plateau_t * p){
     for(int i = 0; i<(p->nb_colonnes)-2; i++){
         printf("       ");
     }
-    printf("FINISH \n\n");
+    printf("FINISH \n");
     printf("       ");
     for(int i = 0; i<(p->nb_colonnes); i++){
         printf("  col  ");
     }
     printf("\n");
-    printf("       ");
+    printf("  ACAB ");
     for(int i = 0; i<(p->nb_colonnes); i++){
         printf("   %d   ", (i));
     }   
     printf("\n");
     for(int i = 0;i<(p->nb_lignes); i++){
         for(int s = 0; s<4; s++){
-            printf("   %d   ",i);
+            if(s == 1){printf("  row  ");}
+            else{
+            if(s == 2){printf("   %d   ",i);}
+            else{printf("       ");}}
             for(int j = 0; j<(p->nb_colonnes); j++){
                 cell_print(p,i,j,s);
             }
