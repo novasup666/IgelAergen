@@ -79,50 +79,56 @@ void cell_print(plateau_t* p, int line, int row, int slice){
         bot= '_';
     }
     if (slice == 0){
-        printf(" %c%c%c ", top,top,top);
+        printf("  %c%c%c  ", top,top,top);
     }
     if (slice == 1){
         if (board_height(p,line,row) == 0){
-            printf("%c   %c",lb,rb);
+            printf(" %c   %c ",lb,rb);
         }
         else{
             char team = board_top(p,line,row);
-            printf("%c%c%c%c%c",lb,(team  + 0x20),(team  + 0x20),(team  + 0x20),rb);
+            printf(" %c%c%c%c%c ",lb,(team  + 0x20),(team  + 0x20),(team  + 0x20),rb);
         }
     }
     if (slice == 2){
         if (board_height(p,line,row) == 0){
-            printf("%c   %c",lb,rb);
+            printf(" %c   %c ",lb,rb);
         }
         if(board_height(p,line,row) == 1){
             char team = board_top(p,line,row);
-            printf("%c%c%c%c%c",lb,(team),(team),(team),rb);
+            printf(" %c%c%c%c%c ",lb,(team),(team),(team),rb);
         }    
         if(board_height(p,line,row) == 2){
             char team = board_peek(p,line,row,1);
-            printf("%c %c %c",lb,(team ),rb);
+            printf(" %c %c %c ",lb,(team ),rb);
         }  
         if(board_height(p,line,row) == 3){
             char team1 = board_peek(p,line,row,1);
             char team2 = board_peek(p,line,row,2);
-            printf("%c%c %c%c",lb,(team1),(team2),rb);
+            printf(" %c%c %c%c ",lb,(team1),(team2),rb);
         }  
         if(board_height(p,line,row) == 4){
             char team1 = board_peek(p,line,row,1);
             char team2 = board_peek(p,line,row,2);
             char team3 = board_peek(p,line,row,3);
-            printf("%c%c%c%c%c",lb,(team1),(team2), (team3),rb);
+            printf(" %c%c%c%c%c ",lb,(team1),(team2), (team3),rb);
         } 
     }
     if (slice == 3){
         int n = board_height(p,line,row);
         if (n>1){
-            printf(" %c%d%c ",bot,n,bot);
+            printf("  %c%d%c  ",bot,n,bot);
         }
         else{
-        printf(" %c%c%c ",bot,bot,bot);}
+        printf("  %c%c%c  ",bot,bot,bot);}
     }
     
+}
+
+void board_print(plateau_t * p){
+    printf("       START ");
+    for(int i = 0; i<)
+    printf("       ")
 }
 
 //un joueur est représenté par un entier entre 0 et 26 et un hérisson par une lettre minuscule entre a et z
