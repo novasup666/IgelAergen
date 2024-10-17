@@ -251,7 +251,7 @@ int jouer_coup(plateau_t *p, int joueur){
             choix_vertical_valide = true;
         }
         else{
-            int deplacement = demander_depalcement(p, joueur); //1=haut 2=bas
+            int deplacement = demander_deplacement(p, joueur); //1=haut 2=bas
             if(deplacement == 1){
                 if(c->ligne <= 0){
                     printf("Erreur, vous ne pouvez pas déplacer le herisson %d vers le haut\n", joueur);
