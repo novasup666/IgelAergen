@@ -43,7 +43,7 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
 }
 
 int lancer_de(){
-    return rand()%6 + 1;
+    return rand()%6 ;
 }
 
 
