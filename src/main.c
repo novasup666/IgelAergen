@@ -286,7 +286,7 @@ int jouer_coup(plateau_t *p, int joueur){
                 }
                 else{
                     if(is_herisson_trapped(p,joueur,de,c->colonne)){
-                        printf("Malheureusement la case (%d, %d) est piégée, l'hérisson est bloqué...\n", de, c->colonne);
+                        printf("Malheureusement la case (%d, %d) est piégée, l'hérisson est bloqué...\n\n", de, c->colonne);
                     }
                     else{
                     board_push(p, c->ligne - 1, c->colonne, player_to_herisson(joueur));
