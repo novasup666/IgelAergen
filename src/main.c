@@ -219,12 +219,12 @@ bool is_herisson_on_case(plateau_t* p, int joueur, int ligne, int colonne){
 
 //TODO utiliser une carte des pièges
 bool is_herisson_traped(plateau_t* p, int joueur, int ligne, int colonne){
-    if (!(is_piege(p->cases[ligne*(p->nb_colonnes)+colonne]))){
+    if (!(p->cases[ligne*(p->nb_colonnes)+colonne]->is_piege)){
         return false;
     }
     for (int j = 0; j < colonne; j++){
         if(!(board_is_empty(p,ligne,j))){
-            return true,
+            return true;
         }
     }
     return !(is_herisson_on_case(p,joueur,ligne,colonne));
@@ -330,7 +330,7 @@ int jouer_coup(plateau_t *p, int joueur){
 void game_loop(plateau_t *p){
     bool partie_finie = false;
     int* joueurs_score = calloc(p->nb_joueurs, sizeof(int));
-    int score_total = 0
+    int score_total = 0;
     int current_player = 0;
     while(!partie_finie){
         //on fait jouer un coup à current_player
