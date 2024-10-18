@@ -227,7 +227,7 @@ bool is_herisson_traped(plateau_t* p, int joueur, int ligne, int colonne){
             return true,
         }
     }
-    return false;
+    return !(is_herisson_on_case(p,joueur,ligne,colonne));
 }
 
 bool is_herisson_last(plateau_t* p, int joueur, int ligne, int colonne){
