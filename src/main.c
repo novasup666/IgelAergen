@@ -219,7 +219,15 @@ bool is_herisson_on_case(plateau_t* p, int joueur, int ligne, int colonne){
 
 //TODO utiliser une carte des pièges
 bool is_herisson_traped(plateau_t* p, int joueur, int ligne, int colonne){
-
+    if (!(is_piege(p->cases[ligne*(p->nb_colonnes)+colonne]))){
+        return false;
+    }
+    for (int j = 0; j < colonne; j++){
+        if(!(board_is_empty(p,ligne,j))){
+            return true,
+        }
+    }
+    return false;
 }
 
 bool is_herisson_last(plateau_t* p, int joueur, int ligne, int colonne){
