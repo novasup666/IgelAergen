@@ -4,7 +4,7 @@
 #include <time.h>
 #include "main.h"
 
-int * PIEGEES  = {2,6,4,5,3,7};
+int PIEGEES [6]  = {2,6,4,5,3,7};
 
 //définit la taille du buffer pour les entiers
 
@@ -38,8 +38,8 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
     p->cases = calloc(nb_lignes*nb_colonnes, sizeof(case_t));
     for(int i = 0; i< nb_lignes*nb_colonnes; i++){
         int ligne = i/nb_colonnes;
-        int colonne = i%nb_lignes;
-        {p->cases[i] = creer_case(ligne, colonne, 0, NULL, PIEGEES[ligne] = colonne);} //TODO changer Null en le bon argument. NULL est le bon argument pour l'initialisation
+        int colonne = i%nb_colonnes;
+        p->cases[i] = creer_case(ligne, colonne, 0, NULL, (PIEGEES[ligne] == colonne)); //TODO changer Null en le bon argument. NULL est le bon argument pour l'initialisation
     }
 
     return p;
