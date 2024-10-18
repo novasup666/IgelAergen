@@ -94,10 +94,10 @@ coo_t* demander_coo(plateau_t *p, int joueur, bool must_have_herisson, bool mand
     bool choix_valide = false;
     printf("=========================================================\n");
     while(!choix_valide){
-        printf("Le joueur %d: Choisissez un herisson:\n>", joueur);
         if(!mandatory && !ask_exit_choice(joueur)){
             return NULL;
         }
+        printf("Le joueur %d: Choisissez un herisson:\n>", joueur);
 
         ligne = demander_coo_plateau(joueur, p->nb_lignes, true, true);
         colonne = demander_coo_plateau(joueur, p->nb_colonnes, false, true);

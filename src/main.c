@@ -259,7 +259,7 @@ int jouer_coup(plateau_t *p, int joueur){
     int de = lancer_de();
     //TODO remove ce fix hideux
     while(de >= p->nb_lignes){
-        printf("Erreur, le dé a donné un nombre trop grand (%d) pour le nombre de lignes (%d)\n", de, p->nb_lignes);
+        printf("Erreur, le dé a donné un nombre trop grand (%d) pour le nombre de lignes (%d)\n\n", de, p->nb_lignes);
         de=lancer_de();
     }
 
@@ -339,8 +339,11 @@ void game_loop(plateau_t *p){
         //on ajoute le score
         //on verifie qu'on a pas fini
         //current_player ++ %= nbjoueur
-
+        printf("\n\n\n\n\n\n\n");
+        printf("\n\n<<<<<<< < < <  <  Nouveau Tour  >  > > > >>>>>>>\n\n\n");
+        board_print(p);
         int r = jouer_coup(p,current_player);
+ 
         if (r >= 0 ){
             joueurs_score[r]++;
             if (joueurs_score[r] >= p->nb_herissons_par_joueurs -1){
@@ -351,6 +354,7 @@ void game_loop(plateau_t *p){
         current_player ++;
         current_player %= p->nb_joueurs;
     }
+    printf("\n\n<<<<<<< < < <  <  Victoire de Joueur %d  >  > > > >>>>>>>\n\n",current_player);
 }
 
 
@@ -373,14 +377,14 @@ int main(){
 
     plateau_t* p = initialiser_partie(NB_LIGNES, NB_COLONNES, info);
     printf("\n\n<<<<<<< < < <  <  Plateau initialisé !  >  > > > >>>>>>>\n\n");
-    board_print(p);
-    jouer_coup(p, 0);
+    /*board_print(p);
+    printf("\n\n%d\n\n",jouer_coup(p, 0));
         board_print(p);
-
+    */
     //coo_t* c = demander_coo(p, 0, true);
     //printf("Vous avez choisi la case (%d, %d)\n", c->ligne, c->colonne);
     //free(c);
-    
+    game_loop(p);
 
 
 
