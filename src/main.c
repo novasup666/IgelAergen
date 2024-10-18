@@ -347,7 +347,7 @@ void game_loop(plateau_t *p){
             partie_finie = true;
         }
         current_player ++;
-        current_player %= p->nb_joueur;
+        current_player %= p->nb_joueurs;
     }
 }
 

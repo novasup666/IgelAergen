@@ -52,7 +52,7 @@ info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
 
 
 int ask_exit_choice(int joueur){
-    printf("Joueur %d, ce choix est optionelle: 0 pour ne rien faire, 1 faire un choix\n>");
+    printf("Joueur %d, ce choix est optionel: 0 pour ne rien faire, 1 faire un choix\n>",joueur);
     int c = readInt(1);
     return c;
 }
