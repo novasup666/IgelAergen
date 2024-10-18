@@ -346,9 +346,7 @@ void game_loop(plateau_t *p){
             if (joueurs_score[r] >= p->nb_herissons_par_joueurs -1){
                 partie_finie = true;
             }
-            score_total++;
         }
-
 
         current_player ++;
         current_player %= p->nb_joueurs;

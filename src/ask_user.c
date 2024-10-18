@@ -53,7 +53,7 @@ info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
 
 int ask_exit_choice(int joueur){
     printf("Joueur %d, ce choix est optionel: 0 pour ne rien faire, 1 faire un choix\n>",joueur);
-    int c = readInt(1);
+    int c = readInt(TAILLE_MAX_ENTIER);
     return c;
 }
 
@@ -122,7 +122,7 @@ int demander_deplacement(plateau_t *p, int joueur){
     int deplacement = -1;
     while(deplacement != 1 && deplacement != 2){
         printf("Joueur %d, voulez vous déplacer vers le haut (1) ou vers le bas (2) ?\n>", joueur);
-        deplacement = readInt(1);
+        deplacement = readInt(TAILLE_MAX_ENTIER);
         if(deplacement != 1 && deplacement != 2){
             printf("Erreur, veuillez indiquer 1 ou 2 !\n");
         }
