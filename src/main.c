@@ -185,7 +185,7 @@ int herisson_to_player(char herisson){
 plateau_t* initialiser_partie(int lignes, int colonnes, info_partie_t* info){
     plateau_t *p = creer_plateau(lignes, colonnes);
     p->nb_joueurs = info->nb_joueurs;
-    p->nb_herrisons_par_joueurs = info->nb_herissons_par_joueurs;
+    p->nb_herissons_par_joueurs = info->nb_herissons_par_joueurs;
     //place les herissons correctements sur la 1er ligne
     for(int joueur = 0; joueur < info->nb_joueurs; joueur++){
         for(int herisson = 0; herisson < info->nb_herissons_par_joueurs; herisson++){
@@ -347,7 +347,7 @@ void game_loop(plateau_t *p){
             partie_finie = true;
         }
         current_player ++;
-        current_player %= p->nbjoueur;
+        current_player %= p->nb_joueur;
     }
 }
 

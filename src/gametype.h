@@ -16,7 +16,7 @@ struct plateau_s{
     int nb_lignes;
     int nb_colonnes;
     int nb_joueurs;
-    int nb_herrisons_par_joueurs;
+    int nb_herissons_par_joueurs;
     case_t** cases; //tableau 1D de cases* !!!
 };
 typedef struct plateau_s plateau_t;
