@@ -92,7 +92,8 @@ coo_t* demander_coo(plateau_t *p, int joueur, bool must_have_herisson, bool mand
     int ligne;
     int colonne;
     bool choix_valide = false;
-    printf("=========================================================\n");
+    // sont moches les égals là
+    //printf("=========================================================\n");
     while(!choix_valide){
         if(!mandatory && !ask_exit_choice(joueur)){
             return NULL;

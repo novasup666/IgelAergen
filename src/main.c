@@ -263,7 +263,7 @@ int jouer_coup(plateau_t *p, int joueur){
         de=lancer_de();
     }
 
-    printf("Le joueur %d a lancé un %d et peu donc faire avancer un herisson de la ligne %d\n", joueur, de, de);
+    printf("Le joueur %d a lancé un %d et peu donc faire avancer un herisson de la ligne %d\n\n", joueur, de, de);
     
     //on laisse le joueur deplacer un herisson verticalement si il le désire
     bool choix_vertical_valide = false;
