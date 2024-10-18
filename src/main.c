@@ -4,17 +4,19 @@
 #include <time.h>
 #include "main.h"
 
+int * PIEGEES  = {2,6,4,5,3,7};
 
 //définit la taille du buffer pour les entiers
 
 //TODO remplacer ca par la lecture des arguments du main
-#define NB_LIGNES 3
-#define NB_COLONNES 5
+#define NB_LIGNES 6
+#define NB_COLONNES 9
+
 //gère la logique du jeu 
 
 // /!\ ON STOCKERA DES MINUSCULES !!!!!!
 
-case_t* creer_case(int ligne, int colonne, int nb_herissons, char* herissons){
+case_t* creer_case(int ligne, int colonne, int nb_herissons, char* herissons, bool piegee){
 
     rca_t * h = creer_rca(1); 
     for(int i=0; i<nb_herissons; i++){
@@ -25,6 +27,7 @@ case_t* creer_case(int ligne, int colonne, int nb_herissons, char* herissons){
     c->ligne = ligne;
     c->colonne = colonne;
     c->herissons = h;
+    c->is_piege = piegee;
     return c;
 }
 
@@ -36,7 +39,7 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
     for(int i = 0; i< nb_lignes*nb_colonnes; i++){
         int ligne = i/nb_colonnes;
         int colonne = i%nb_lignes;
-        p->cases[i] = creer_case(ligne, colonne, 0, NULL); //TODO changer Null en le bon argument. NULL est le bon argument pour l'initialisation
+        {p->cases[i] = creer_case(ligne, colonne, 0, NULL, PIEGEES[ligne] = colonne);} //TODO changer Null en le bon argument. NULL est le bon argument pour l'initialisation
     }
 
     return p;
@@ -142,11 +145,11 @@ void cell_print(plateau_t* p, int line, int col, int slice){
 
 void board_print(plateau_t * p){
    
-    printf("        START ");
+    printf("        DÉBUT ");
     for(int i = 0; i<(p->nb_colonnes)-2; i++){
         printf("       ");
     }
-    printf("FINISH \n");
+    printf("  FIN \n");
     printf("Adil   ");
     for(int i = 0; i<(p->nb_colonnes); i++){
         printf("  col  ");
@@ -159,7 +162,7 @@ void board_print(plateau_t * p){
     printf("\n");
     for(int i = 0;i<(p->nb_lignes); i++){
         for(int s = 0; s<4; s++){
-            if(s == 1){printf("  row  ");}
+            if(s == 1){printf(" ligne ");}
             else{
             if(s == 2){printf("   %d   ",i);}
             else{printf("       ");}}
@@ -370,6 +373,7 @@ int main(){
         cell_print()
     }
     */
+
 
 
     info_partie_t* info = demander_info_partie(NB_LIGNES, NB_COLONNES);
