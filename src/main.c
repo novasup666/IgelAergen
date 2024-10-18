@@ -9,8 +9,8 @@ int PIEGEES [6]  = {2,6,4,5,3,7};
 //définit la taille du buffer pour les entiers
 
 //TODO remplacer ca par la lecture des arguments du main
-#define NB_LIGNES 6
-#define NB_COLONNES 9
+#define NB_LIGNES 3
+#define NB_COLONNES 4
 
 //gère la logique du jeu 
 
@@ -221,7 +221,7 @@ bool is_herisson_on_case(plateau_t* p, int joueur, int ligne, int colonne){
 }
 
 //TODO utiliser une carte des pièges
-bool is_herisson_traped(plateau_t* p, int joueur, int ligne, int colonne){
+bool is_herisson_trapped(plateau_t* p, int joueur, int ligne, int colonne){
     if (!(p->cases[ligne*(p->nb_colonnes)+colonne]->is_piege)){
         return false;
     }
@@ -285,9 +285,13 @@ int jouer_coup(plateau_t *p, int joueur){
                     printf("Erreur, vous ne pouvez pas déplacer le herisson %d vers le haut\n", joueur);
                 }
                 else{
+                    if(is_herisson_trapped(p,joueur,de,c->colonne)){
+                        printf("Malheureusement la case (%d, %d) est piégée, l'hérisson est bloqué...\n", de, c->colonne);
+                    }
+                    else{
                     board_push(p, c->ligne - 1, c->colonne, player_to_herisson(joueur));
                     board_pop(p, c->ligne, c->colonne);
-                    choix_vertical_valide = true;
+                    choix_vertical_valide = true;}
                 }
             }
             else{
@@ -295,9 +299,14 @@ int jouer_coup(plateau_t *p, int joueur){
                     printf("Erreur, vous ne pouvez pas déplacer le herisson %d vers le bas\n", joueur);
                 }
                 else{
+                    if(is_herisson_trapped(p,joueur,de,c->colonne)){
+                        printf("Malheureusement la case (%d, %d) est piégée, l'hérisson est bloqué...\n", de, c->colonne);
+                    }
+                    else{
                     board_push(p, c->ligne + 1, c->colonne, player_to_herisson(joueur));
                     board_pop(p, c->ligne, c->colonne);
-                    choix_vertical_valide = true;
+                        choix_vertical_valide = true;
+                    }
                 }
             }
         }
@@ -317,6 +326,9 @@ int jouer_coup(plateau_t *p, int joueur){
         int colonne = demander_coo_plateau(joueur, p->nb_colonnes-1, false, true); //on ne veut pas bouger un herisson sur la dernière colonne
         if(board_is_empty(p, de, colonne)){
             printf("Erreur, la case (%d, %d) est vide\n", de, colonne);
+        }
+        else if(is_herisson_trapped(p,joueur,de,colonne)){
+            printf("Malheureusement la case (%d, %d) est piégée, l'hérisson est bloqué...\n", de, colonne);
         }
         else{
             //on déplace le herisson
@@ -357,6 +369,8 @@ void game_loop(plateau_t *p){
         current_player ++;
         current_player %= p->nb_joueurs;
     }
+
+    board_print(p);
     printf("\n\n<<<<<<< < < <  <  Victoire de Joueur %d  >  > > > >>>>>>>\n\n",current_player);
 }
 
