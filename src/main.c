@@ -269,7 +269,7 @@ int jouer_coup(plateau_t *p, int joueur){
     bool choix_vertical_valide = false;
     int return_value = -1;
     while(!choix_vertical_valide){
-        printf("Selectionnez un herisson à déplacer verticalement (optionelle):\n");
+        printf("Selectionnez un herisson à déplacer verticalement (optionel):\n");
         coo_t* c = demander_coo(p, joueur, true, false);
         if(c==NULL){
             printf("Joueur %d, vous avez choisi de ne pas déplacer de herisson verticalement\n", joueur);
@@ -318,7 +318,7 @@ int jouer_coup(plateau_t *p, int joueur){
         else{
             //on déplace le herisson
             board_push(p, de, colonne+1, board_pop(p, de, colonne));
-            if(colonne+1){
+            if(colonne+1 == p->nb_colonnes -1){
                 return_value = herisson_to_player(board_top(p, de, colonne+1));
             }
             choix_horizontal_valide = true;
