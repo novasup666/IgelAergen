@@ -330,12 +330,24 @@ int jouer_coup(plateau_t *p, int joueur){
 void game_loop(plateau_t *p){
     bool partie_finie = false;
     int* joueurs_score = calloc(p->nb_joueurs, sizeof(int));
+    int score_total = 0
     int current_player = 0;
     while(!partie_finie){
         //on fait jouer un coup à current_player
         //on ajoute le score
         //on verifie qu'on a pas fini
         //current_player ++ %= nbjoueur
+
+        int r = jouer_coup(p,current_player);
+        if (r >= 0 ){
+            joueurs_score[r]++;
+            score_total++;
+        }
+        if (score_total>=((p->nb_joueurs*p->nb_herissons_par_joueurs)-1)){
+            partie_finie = true;
+        }
+        current_player ++;
+        current_player %= p->nbjoueur;
     }
 }
 
