@@ -251,6 +251,9 @@ bool is_coup_possible(plateau_t* p, int ligne){
     return false;
 }
 
+//-2 si il peut pas jouer
+//-1 si il joue et que aucun herisson arrive sur la dernière colonne
+//player si un herisson de player arrive sur la dernière colonne
 int jouer_coup(plateau_t *p, int joueur){
     printf("DEBUG: joueur %d\n", joueur);
     int de = lancer_de();
@@ -264,6 +267,7 @@ int jouer_coup(plateau_t *p, int joueur){
     
     //on laisse le joueur deplacer un herisson verticalement si il le désire
     bool choix_vertical_valide = false;
+    int return_value = -1;
     while(!choix_vertical_valide){
         printf("Selectionnez un herisson à déplacer verticalement (optionelle):\n");
         coo_t* c = demander_coo(p, joueur, true, false);
@@ -298,11 +302,9 @@ int jouer_coup(plateau_t *p, int joueur){
 
         board_print(p);
 
-    //TODO: ici on doit input une colonne, vérifier qu'il y a un herisson, et le déplacer si un coup est possible
-
     if(!is_coup_possible(p, de)){
-        printf("Joueur %d: vous ne pouvez pas jouer de coup\n", joueur);
-        return 0;
+        printf("Joueur %d: vous ne pouvez pas jouer de coup, vous passez votre tour !\n", joueur);
+        return -2;
     }
 
     //le joueur doit donc déplacer un herisson horizontalement de la ligne déterminée par le dé
@@ -316,14 +318,26 @@ int jouer_coup(plateau_t *p, int joueur){
         else{
             //on déplace le herisson
             board_push(p, de, colonne+1, board_pop(p, de, colonne));
+            if(colonne+1){
+                return_value = herisson_to_player(board_top(p, de, colonne+1));
+            }
             choix_horizontal_valide = true;
         }
     }
-
+    return return_value;
 }
 
-
-
+void game_loop(plateau_t *p){
+    bool partie_finie = false;
+    int* joueurs_score = calloc(p->nb_joueurs, sizeof(int));
+    int current_player = 0;
+    while(!partie_finie){
+        //on fait jouer un coup à current_player
+        //on ajoute le score
+        //on verifie qu'on a pas fini
+        //current_player ++ %= nbjoueur
+    }
+}
 
 
 
