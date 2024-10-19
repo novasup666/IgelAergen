@@ -1,6 +1,10 @@
 /*
 Ressource conseillé par le prof de réseau !
-Ce code n'a pas était écrit par nous !
+
+!!!! Ce code n'a pas été écrit par nous !!!!
+
+
+
 Source: https://csapp.cs.cmu.edu/3e/ics3/code/src/csapp.c et https://csapp.cs.cmu.edu/3e/ics3/code/include/csapp.h
 */
 
