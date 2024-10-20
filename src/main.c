@@ -445,7 +445,7 @@ int main(){
         if (mode == 3){
             printf("Entrez l'adresse (IPV4) du serveur':\n>");
             char host [17] ;
-            fgets(host,17,stdin);
+            scanf("%s",&host);
             cinfo->hostname = host;
 
             client(cinfo);
