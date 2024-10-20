@@ -49,7 +49,6 @@ void* serveur_test(void* arg){
     return NULL;
 }*/
 
-//TODO réécrire cette fonction
 int calc_size(int n){
     int size = 0;
     while(n > 0){
