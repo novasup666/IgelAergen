@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <pthread.h>
 #include "main.h"
+#include "multi.h"
 
 int PIEGEES [6]  = {2,6,4,5,3,7};
 
@@ -381,33 +383,71 @@ void game_loop(plateau_t *p){
 int main(){
     srand(time(NULL)); //initialise le générateur de nombre aléatoire, à appeler une seule fois !
     
-    /*
-    case_t c = creer_case(1,2,3,{'a';'b';'c'});
-    for(int i = 0; i < 4; i++){
-        cell_print()
+    printf("\n\n<<<<<<< < < <  <  Bienvenue dans Igel Aergen  >  > > > >>>>>>>\n\n");
+    printf("Ce programme permet de jouer à ce jeu de 3 façons différentes\n- En mode classique: tout les joueurs jouent sur la machine\n- En mode multi:\n    - un joueur est le serveur\n    - les autres sont les clients\n");
+
+    printf("Entrez le mode de jeu désiré : \n 1: classique    | 2: serveur    | 3: client\n>");
+
+    int mode = readInt(2);
+
+    if (mode == 1){
+        info_partie_t* info = demander_info_partie(NB_LIGNES, NB_COLONNES);
+        plateau_t* p = initialiser_partie(NB_LIGNES, NB_COLONNES, info);
+        printf("\n\n<<<<<<< < < <  <  Plateau initialisé !  >  > > > >>>>>>>\n\n");
+        game_loop(p);
+        liberer_plateau(p);
+        liberer_info_partie(info);
     }
-    */
+    else{
+        printf("\n\n<<<<<<< < < <  <  Vous avez choisi le mode multi  >  > > > >>>>>>>\n\n");
+        printf("Entrez le nombre de joueurs:\n>");
+        int nb_joueurs = readInt(2);
+        printf("Entrez le nombre d'hérissons par joueurs:\n>");
+        int nb_herissons_par_joueurs = readInt(2);
+        printf("Entrez le port de communication utilisé:\n>");
+        char port [8] ;
+        fgets(port,8,stdin);
+        printf("Entrez votre numéro de joueur:\n>");
+        int joueur = readInt(3);
+        
+        client_partie_info_t * cinfo = malloc(sizeof(server_partie_info_t));
+        cinfo->nb_joueur = nb_joueurs;
+        cinfo->nb_herisson_par_joueur = nb_herissons_par_joueurs;
+        cinfo->joueur = joueur;
+        cinfo->port = port;
 
+        if (mode == 2){
+            /*Un joueur dont la machine prends le rôle de serveur va ainsi executer en
+            parallèle la fonction de serveur permettant de synchroniser le multijoueur
+            ainsi que la fonction de client permettant au joueur de jouer aussi.
+            */
+            server_partie_info_t * sinfo = malloc(sizeof(server_partie_info_t));
+            sinfo->nb_joueur = nb_joueurs;
+            sinfo->nb_herisson_par_joueur = nb_herissons_par_joueurs;
+            sinfo->port = port;
 
+            cinfo->hostname = "localhost";
 
-    info_partie_t* info = demander_info_partie(NB_LIGNES, NB_COLONNES);
+            pthread_t tid;
+            pthread_create(&tid,NULL,serveur,sinfo);
+            client(cinfo);
+            pthread_join(tid,NULL);
 
+            free(sinfo);
+        }
+    
+        if (mode == 3){
+            printf("Entrez l'adresse (IPV4) du serveur':\n>");
+            char host [17] ;
+            fgets(host,17,stdin);
+            cinfo->hostname = host;
 
-    plateau_t* p = initialiser_partie(NB_LIGNES, NB_COLONNES, info);
-    printf("\n\n<<<<<<< < < <  <  Plateau initialisé !  >  > > > >>>>>>>\n\n");
-    /*board_print(p);
-    printf("\n\n%d\n\n",jouer_coup(p, 0));
-        board_print(p);
-    */
-    //coo_t* c = demander_coo(p, 0, true);
-    //printf("Vous avez choisi la case (%d, %d)\n", c->ligne, c->colonne);
-    //free(c);
-    game_loop(p);
+            client(cinfo);
+        }
 
-
+        free(cinfo);
+    }
 
     
-    liberer_plateau(p);
-    liberer_info_partie(info);
     return 0;
 }

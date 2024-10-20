@@ -313,6 +313,7 @@ void* client(void* arg){
     return NULL;
 }
 
+
 int main(){
     server_partie_info_t info;
     info.nb_joueur = 1;
