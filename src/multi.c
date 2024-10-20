@@ -12,6 +12,9 @@ Un client getaddrinfo(), il obtient un socket, il se connecte et utilise recv() 
 */
 
 
+
+
+
 #pragma endregion CLIENT
 
 //int nb_joueur = 2;
