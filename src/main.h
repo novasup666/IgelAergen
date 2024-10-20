@@ -5,6 +5,11 @@
 #include "resizableCharArray.h"
 #include "util.h"
 #include "ask_user.h"
+#include "multi.h"
+
+
+#define NB_LIGNES 3
+#define NB_COLONNES 4
 
 char board_top (plateau_t*p, int line, int col);
 
@@ -14,5 +19,9 @@ char board_top (plateau_t*p, int line, int col);
 bool is_herisson_on_case(plateau_t* p, int joueur, int ligne, int colonne);
 bool is_herisson_traped(plateau_t* p, int joueur, int ligne, int colonne);
 bool is_herisson_last(plateau_t* p, int joueur, int ligne, int colonne);
+
+//fonction d'intialisation de la partie
+plateau_t* creer_plateau(int nb_lignes, int nb_colonnes);
+void liberer_plateau(plateau_t* p);
 
 #endif

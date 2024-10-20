@@ -2,6 +2,7 @@
 #define MULTI_H
 
 #include "gametype.h"
+#include "main.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -14,6 +15,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <string.h>
+
 
 //source: syllabus du cours de réseau
 
@@ -51,8 +53,12 @@ typedef struct client_partie_info client_partie_info_t;
 
 
 
+void * serveur(void* arg);
+void * client(void* arg);
 
 
+void* serveur_test(void* arg);
 
+int int_to_ascii(int n, char* buffer);
 
 #endif

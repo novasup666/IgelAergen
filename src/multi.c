@@ -18,12 +18,12 @@ FILE* log_file = NULL;
 
 
 
-/* fonction d'exemple pour  ce familiariser avec les sockets, je le delete après TODO DELETE !
-void* serveur(void* arg){
+/* fonction d'exemple pour  ce familiariser avec les sockets, je le delete après TODO DELETE ! 
+void* serveur_test(void* arg){
     printf("Serveur lancé\n");
     int listenfd = -1;
     int clientfd = -1;
-    listenfd = open_listenfd(port);
+    listenfd = open_listenfd("8080");
     if(listenfd < 0){
         printf("Erreur lors de l'ouverture du socket d'écoute\n");
         return NULL;
@@ -50,6 +50,15 @@ void* serveur(void* arg){
 }*/
 
 //TODO réécrire cette fonction
+int calc_size(int n){
+    int size = 0;
+    while(n > 0){
+        n = n/10;
+        size++;
+    }
+    return size;
+}
+
 int int_to_ascii(int n, char* buffer){
     if(n == 0){
         buffer[0] = '0';
@@ -57,14 +66,12 @@ int int_to_ascii(int n, char* buffer){
         return 1;
     }
 
-    int i = 0;
-    while(n > 0){
-        buffer[i] = n%10 + '0';
+    int size = calc_size(n);
+    for(int i=calc_size(n)-1; i>=0; i--){
+        buffer[i] = (n%10) + '0';
         n = n/10;
-        i++;
     }
-    buffer[i] = '\0';
-    return i;
+    return size;
 }
 
 void clear_buffer(char* buffer, int size){
@@ -81,7 +88,8 @@ ssize_t write_log(int fd, const char *buf, size_t count, bool is_serv){
 
 
 //TODO clear buffer après chaque read
-void * server(void* arg){
+void * serveur(void* arg){
+    printf("Serveur lancé\n");
     server_partie_info_t* info = (server_partie_info_t*) arg;
     int nb_joueur = info->nb_joueur;
     int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
@@ -89,11 +97,17 @@ void * server(void* arg){
 
     int listenfd = -1;
     int clientfd = -1;
+    printf("OPEN LISTE on %s:\n", port);
     listenfd = open_listenfd(port);
-    if(listenfd < 0){
-        printf("Erreur lors de l'ouverture du socket d'écoute\n");
-        return NULL;
+    printf("LISTENFD: %d\n", listenfd);
+    while(listenfd < 0){
+        printf("[SERVER] FATAL ! Erreur lors de l'ouverture du socket d'écoute, press enter to retry\n");
+        getchar();
+        listenfd = open_listenfd(port);
+        //exit(-1);
+        //return NULL;
     }
+
     printf("Serveur en attente de connexion\n");
     int nb_connect = 0;
     socklen_t clientlen;
@@ -104,7 +118,7 @@ void * server(void* arg){
     for(int i = 0; i < nb_joueur; i++){
         joueurs[i] = -1;
     }
-
+    
     //on attend les connections des joueurs
     while(nb_joueur_connecte < nb_joueur && (clientfd = accept(listenfd, &clientaddr, &clientlen)) > 0){
         printf("Nouvelle connection\n");
@@ -177,6 +191,7 @@ void * server(void* arg){
     }
 
     //TODO on ferme les connections
+    free(joueurs);
     return NULL;
 }
 
@@ -223,11 +238,12 @@ void* client(void* arg){
 
     plateau_t * p = creer_plateau(NB_LIGNES, NB_COLONNES);
 
-    printf("Client lancé\n");
+    printf("Client lancé, se connete à %s:%s\n", hostname, port);
     int clientfd = open_clientfd(hostname, port);
-    if(clientfd < 0){
-        printf("Erreur lors de la connexion au serveur\n");
-        return NULL;
+    while(clientfd < 0){
+        printf("Erreur lors de la connexion au serveur, press any key to retry\n");
+        int c = getchar();
+        clientfd = open_clientfd(hostname, port);
     }
 
     bool init_fini = false;
@@ -313,95 +329,13 @@ void* client(void* arg){
 
 
     printf("Partie finie\n");    
+    liberer_plateau(p);
 
     return NULL;
 }
 
 
 
-/*
-void* serverv2(void* arg){
-    server_partie_info_t* info = (server_partie_info_t*) arg;
-    int nb_joueur = info->nb_joueur;
-    int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
-    char* port = info->port;
-
-    int listenfd = -1;
-    int clientfd = -1;
-    listenfd = open_listenfd(port);
-    if(listenfd < 0){
-        printf("Erreur lors de l'ouverture du socket d'écoute\n");
-        return NULL;
-    }
-    printf("Serveur en attente de connexion\n");
-    int nb_connect = 0;
-    socklen_t clientlen;
-    struct sockaddr_storage clientaddr;
-
-    int nb_joueur_connecte = 0;
-    int* joueurs = malloc(sizeof(int) * nb_joueur);
-    for(int i = 0; i < nb_joueur; i++){
-        joueurs[i] = -1;
-    }
-
-    //on attend les connections des joueurs
-    while(nb_joueur_connecte < nb_joueur && (clientfd = accept(listenfd, &clientaddr, &clientlen)) > 0){
-        printf("Nouvelle connection\n");
-        //traitement de la connexion
-        write_log(clientfd, "who\n", 4, true);
-        char buffer[READ_SIZE];
-        clear_buffer(buffer, READ_SIZE);
-        int n = read(clientfd, buffer, READ_SIZE); //on demande numéro du joueur
-        int num_joueur = atoi(buffer);
-        printf("[Serveur] identifiant joueur %d: recoit %d\n",nb_joueur_connecte, num_joueur);
-        joueurs[num_joueur] = clientfd;
-        nb_joueur_connecte++;
-    }
-
-    printf("[Server]: Tous les joueurs sont connectés\n");
-    for(int i = 0; i < nb_joueur; i++){
-        printf("[Serveur] envoie all_players_ok\n");
-        write_log(joueurs[i], "all_players_ok\n", 15, true);
-    }
-
-    for(int joueur = 0; joueur < nb_joueur; joueur++){
-        write_log(joueurs[joueur], "place\n", 6, true);
-        char buffer[READ_SIZE];
-        clear_buffer(buffer, READ_SIZE);
-        read(joueurs[joueur], buffer, READ_SIZE);
-        for(int other_player = 0; other_player < nb_joueur; other_player++){
-            if(other_player == joueur){
-                continue;
-            }
-            write_log(joueurs[other_player], "placed\n", 6, true);
-            write_log(joueurs[other_player], buffer, 4, true);
-        }
-    }
-}
-*/
-
-int main(){
-    server_partie_info_t info;
-    info.nb_joueur = 1;
-    info.nb_herisson_par_joueur = 1;
-    info.port = "8080";
-
-    client_partie_info_t info_client;
-    info_client.nb_joueur = 1;
-    info_client.nb_herisson_par_joueur = 1;
-    info_client.joueur = 0;
-    info_client.port = "8080";
-    info_client.hostname = "localhost";
-
-    pthread_t c, serv;
-    printf("On lance le thread serveur: \n");
-    pthread_create(&serv, NULL, server, &info);
-    printf("On lance le thread client: \n");
-    client(&info_client);
-    pthread_join(serv, NULL);
-    //close(c);
-    return 0;
-}
 
 /*
 L'idée d'un serveur: attends les connection des joueurs, lance le signale de départ

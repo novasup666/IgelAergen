@@ -11,8 +11,7 @@ int PIEGEES [6]  = {2,6,4,5,3,7};
 //définit la taille du buffer pour les entiers
 
 //TODO remplacer ca par la lecture des arguments du main
-#define NB_LIGNES 3
-#define NB_COLONNES 4
+
 
 //gère la logique du jeu 
 
@@ -405,12 +404,16 @@ int main(){
         printf("Entrez le nombre d'hérissons par joueurs:\n>");
         int nb_herissons_par_joueurs = readInt(2);
         printf("Entrez le port de communication utilisé:\n>");
-        char port [8] ;
-        fgets(port,8,stdin);
+        int port_int = readInt(5);
+        printf("Le port est %d\n", port_int);
+        char port[5];
+        int_to_ascii(port_int, port);
+        printf("int to ascii: %s\n", port);
+
         printf("Entrez votre numéro de joueur:\n>");
         int joueur = readInt(3);
         
-        client_partie_info_t * cinfo = malloc(sizeof(server_partie_info_t));
+        client_partie_info_t * cinfo = malloc(sizeof(client_partie_info_t));
         cinfo->nb_joueur = nb_joueurs;
         cinfo->nb_herisson_par_joueur = nb_herissons_par_joueurs;
         cinfo->joueur = joueur;
@@ -426,10 +429,13 @@ int main(){
             sinfo->nb_herisson_par_joueur = nb_herissons_par_joueurs;
             sinfo->port = port;
 
+
             cinfo->hostname = "localhost";
 
             pthread_t tid;
+            printf("On lance le thread serveur sur le port %s: \n", sinfo->port);
             pthread_create(&tid,NULL,serveur,sinfo);
+            printf("On lance le client: \n");
             client(cinfo);
             pthread_join(tid,NULL);
 
@@ -452,3 +458,25 @@ int main(){
     return 0;
 }
 
+int old_test_main(){
+    server_partie_info_t info;
+    info.nb_joueur = 1;
+    info.nb_herisson_par_joueur = 1;
+    info.port = "8080";
+
+    client_partie_info_t info_client;
+    info_client.nb_joueur = 1;
+    info_client.nb_herisson_par_joueur = 1;
+    info_client.joueur = 0;
+    info_client.port = "8080";
+    info_client.hostname = "localhost";
+
+    pthread_t c, serv;
+    printf("On lance le thread serveur: \n");
+    pthread_create(&serv, NULL, serveur, &info);
+    printf("On lance le thread client: \n");
+    client(&info_client);
+    pthread_join(serv, NULL);
+    //close(c);
+    return 0;
+}
