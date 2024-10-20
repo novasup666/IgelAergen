@@ -1,6 +1,5 @@
 #include "multi.h"
 #include "csapp.h"
-#include <pthread.h>
 
 //PARTIE CLIENT
 
@@ -50,19 +49,26 @@ void* serveur(void* arg){
     return NULL;
 }*/
 
-struct server_partie_info {
-    int nb_joueur;
-    int nb_herisson_par_joueur;
-    const char* port;
-};
-typedef struct partie_info partie_info_t;
+
+int int_to_ascii(int n, char* buffer){
+    int i = 0;
+    while(n > 0){
+        buffer[i] = n%10 + '0';
+        n = n/10;
+        i++;
+    }
+    buffer[i] = '\0';
+    return i;
+}
+
+
 
 
 void * lancer_serveur(void* arg){
-    partie_info_t* info = (partie_info_t*) arg;
+    server_partie_info_t* info = (server_partie_info_t*) arg;
     int nb_joueur = info->nb_joueur;
     int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
-    const char* port = info->port;
+    char* port = info->port;
 
     int listenfd = -1;
     int clientfd = -1;
@@ -110,25 +116,21 @@ void * lancer_serveur(void* arg){
         char bufferX[32];
         char bufferY[32];
 
-        int nb_herisson_correctement_place = 0;
-        while(nb_herisson_correctement_place <= nb_herisson_par_joueur){
+        for(int herisson = 0; herisson < nb_herisson_par_joueur; herisson++){
             //on lit 2 coordonnées
             int x = read(joueurs[j], bufferX, 32);
             int y = read(joueurs[j], bufferY, 32);
-            if(x < 0 || y < 0){
-                write(joueurs[j], "Error: coordonnées invalides\n", 30);
-                continue;
-            }
-            write(joueurs[j], "coo_ok", 2);
+
             //on envoie les coordonnées à tout les joueurs
             char* player_number = malloc(sizeof(char)*(nb_joueur/10)); //on veut écrire le numéro du joueur donc on a besoin de nb_joueur/10 caractères
             for(int i = 0; i < nb_joueur; i++){
-                itoa(j, player_number, 10);
+                int_to_ascii(j, player_number);
                 write(joueurs[i], "coo", 3);
-                write(joueurs[i], player_number, x);
+                write(joueurs[i], player_number, nb_joueur/10);
                 write(joueurs[i], bufferX, x);
                 write(joueurs[i], bufferY, y);
             }
+            free(player_number);
         }
     }
 
@@ -137,32 +139,61 @@ void * lancer_serveur(void* arg){
         write(joueurs[i], "start", 5);
     }
 
-    //TODO finir ici !
-
     //on attend les coups des joueurs
     bool un_joueur_gagne = false;
+    int gagnant = -1;
     while(!un_joueur_gagne){
         for(int i = 0; i < nb_joueur; i++){
+            char* player_number = malloc(sizeof(char)*(nb_joueur/10)); //on veut écrire le numéro du joueur donc on a besoin de nb_joueur/10 caractères
+            char bufferX[32];
+            char bufferY[32];
+            char handshake[32];
             write(joueurs[i], "play", 4);
-            char buffer[32];
-            int n = read(joueurs[i], buffer, 32);
-            for(int j = 0; j < nb_joueur; j++){
-                write(joueurs[j], buffer, n);
+            int x = read(joueurs[i], bufferX, 32);
+            int y = read(joueurs[i], bufferY, 32);
+            read(joueurs[i], handshake, 32);
+            if(strcmp(handshake, "win") == 0){
+                un_joueur_gagne = true;
+                gagnant = i;
             }
+            int_to_ascii(i, player_number);
+            for(int j = 0; j < nb_joueur; j++){
+                write(joueurs[j], "move", 4);
+                write(joueurs[j], player_number, nb_joueur/10);
+                write(joueurs[j], bufferX, x);
+                write(joueurs[j], bufferY, y);
+            }
+            free(player_number);
         }
     }
+    
+    //on a un gagnant
+    char *gagnant_str = malloc(sizeof(char)*nb_joueur/10);
+    int_to_ascii(gagnant, gagnant_str);
+    for(int i = 0; i < nb_joueur; i++){
+        write(joueurs[i], "win", 4);
+        write(joueurs[i], gagnant_str, 1);
+    }
+    free(gagnant_str);
+    return NULL;
 }
 
 
 void* client(void* arg){
+    server_partie_info_t* info = (server_partie_info_t*) arg;
+    int nb_joueur = info->nb_joueur;
+    int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
+    char* port = info->port;
+    char* hostname = info->hostname;
+
     printf("Client lancé\n");
     int clientfd = open_clientfd(hostname, port);
     if(clientfd < 0){
         printf("Erreur lors de la connexion au serveur\n");
         return NULL;
     }
-    char buffer[1024];
-    int n = read(clientfd, buffer, 1024);
+    char buffer[64];
+    int n = read(clientfd, buffer, 64);
     printf("Client lit: %s\n", buffer);
     //on repond au serveur STOP
     write(clientfd, "STOP", 4);
@@ -173,12 +204,12 @@ void* client(void* arg){
 int main(){
 
     pthread_t c, serv;
-    printf("On lance le thread serveur: \n");
-    pthread_create(&serv, NULL, serveur, NULL);
-    printf("On lance le thread client: \n");
-    pthread_create(&c, NULL, client, NULL);
-    pthread_join(serv, NULL);
-    close(c);
+    //printf("On lance le thread serveur: \n");
+    //pthread_create(&serv, NULL, serveur, NULL);
+    //printf("On lance le thread client: \n");
+    //pthread_create(&c, NULL, client, NULL);
+    //pthread_join(serv, NULL);
+    //close(c);
     return 0;
 }
 
@@ -204,14 +235,14 @@ protocole de communication:
 - le client envoie son numéro de joueur
 - le serveur envoie "all_players_ok" pour dire que tout les joueurs sont connectés
 - le serveur envoie "place" pour demander au joueur de placer son pion
-- les clients placent leur pion sous forme de coordonnées et recoivent "coo_ok" si les coordonnées sont valides
+- les clients placent leur pion sous forme de coordonnées en envoyant 2 write: "[x]" "[y]"
 - le serveur envoie "coo" suivit de 3 write: "[joueur]"" "[x]" "[y]" pour dire à tout les joueurs où le joueur [joueur] a placé son pion en [x] [y]
 - le serveur envoie "start" pour commencer la partie
 - le serveur envoie "play" pour demander au joueur de jouer
-- le joueur envoie son coup
+- le joueur envoie son coup "[x]" "[y]"
 - le joueur envoie "next" pour dire qu'il a fini de jouer ou "win" pour dire qu'il a gagné
-- le serveur envoie le coup à tout les joueurs
+- le serveur envoie le coup à tout les joueurs "move" "joueur" "[x]" "[y]"
 ...
-- le serveur envoie "win [numero]" à tout les joueurs
+- le serveur envoie "win" "[numero]" à tout les joueurs
 - le serveur se ferme
 */
