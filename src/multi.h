@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <pthread.h>
+#include <string.h>
 
 //source: syllabus du cours de réseau
 
@@ -26,14 +28,27 @@
     struct addrinfo *ai_next;
 };*/
 
-typedef struct addrinfo addrinfo_t;
+//typedef struct addrinfo addrinfo_t;
 
 
 
 
+struct server_partie_info {
+    int nb_joueur;
+    int nb_herisson_par_joueur;
+    char* port;
+    char* hostname;
+};
+typedef struct server_partie_info server_partie_info_t;
 
-
-
+struct client_partie_info {
+    int nb_joueur;
+    int nb_herisson_par_joueur;
+    int joueur;
+    char* port;
+    char* hostname;
+};
+typedef struct client_partie_info client_partie_info_t;
 
 
 
