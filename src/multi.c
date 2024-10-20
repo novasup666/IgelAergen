@@ -49,8 +49,14 @@ void* serveur(void* arg){
     return NULL;
 }*/
 
-
+//TODO réécrire cette fonction
 int int_to_ascii(int n, char* buffer){
+    if(n == 0){
+        buffer[0] = '0';
+        buffer[1] = '\0';
+        return 1;
+    }
+
     int i = 0;
     while(n > 0){
         buffer[i] = n%10 + '0';
@@ -61,10 +67,16 @@ int int_to_ascii(int n, char* buffer){
     return i;
 }
 
+void clear_buffer(char* buffer, int size){
+    for(int i = 0; i < size; i++){
+        buffer[i] = '\0';
+    }
+}
 
 
 
-void * lancer_serveur(void* arg){
+//TODO clear buffer après chaque read
+void * server(void* arg){
     server_partie_info_t* info = (server_partie_info_t*) arg;
     int nb_joueur = info->nb_joueur;
     int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
@@ -89,25 +101,23 @@ void * lancer_serveur(void* arg){
     }
 
     //on attend les connections des joueurs
-    while((clientfd = accept(listenfd, &clientaddr, &clientlen)) > 0 && nb_joueur_connecte <= nb_joueur){
+    while(nb_joueur_connecte < nb_joueur && (clientfd = accept(listenfd, &clientaddr, &clientlen)) > 0){
         printf("Nouvelle connection\n");
         //traitement de la connexion
+        printf("[Serveur] envoie who\n");
         write(clientfd, "who", 3);
         char buffer[32];
         int n = read(clientfd, buffer, 32); //on demande numéro du joueur
         int num_joueur = atoi(buffer);
-        if(num_joueur < 0 || num_joueur >= nb_joueur){
-            write(clientfd, "Error: joueur non reconnu\n", 27);
-            close(clientfd);
-            continue;
-        }
+        printf("[Serveur] recoit %d\n", num_joueur);
         joueurs[num_joueur] = clientfd;
         nb_joueur_connecte++;
     }
-
+    printf("Tous les joueurs sont connectés\n");
     //on a tous les joueurs, on peut commencer à demander les placements
     for(int i = 0; i < nb_joueur; i++){
-        write(joueurs[i], "all_players_ok", 2);
+        printf("[Serveur] envoie all_players_ok\n");
+        write(joueurs[i], "all_players_ok", 14);
     }
 
     //les joueurs placent leur pion
@@ -122,8 +132,11 @@ void * lancer_serveur(void* arg){
             int y = read(joueurs[j], bufferY, 32);
 
             //on envoie les coordonnées à tout les joueurs
-            char* player_number = malloc(sizeof(char)*(nb_joueur/10)); //on veut écrire le numéro du joueur donc on a besoin de nb_joueur/10 caractères
+            char* player_number = malloc(sizeof(char)*(nb_joueur)); //TODO on veut écrire le numéro du joueur donc on a besoin de 1+nb_joueur/10 caractères
             for(int i = 0; i < nb_joueur; i++){
+                if(i == j){
+                    continue;
+                }
                 int_to_ascii(j, player_number);
                 write(joueurs[i], "coo", 3);
                 write(joueurs[i], player_number, nb_joueur/10);
@@ -144,7 +157,7 @@ void * lancer_serveur(void* arg){
     int gagnant = -1;
     while(!un_joueur_gagne){
         for(int i = 0; i < nb_joueur; i++){
-            char* player_number = malloc(sizeof(char)*(nb_joueur/10)); //on veut écrire le numéro du joueur donc on a besoin de nb_joueur/10 caractères
+            char* player_number = malloc(sizeof(char)*(nb_joueur)); //TODO on veut écrire le numéro du joueur donc on a besoin de nb_joueur/10 caractères
             char bufferX[32];
             char bufferY[32];
             char handshake[32];
@@ -175,14 +188,17 @@ void * lancer_serveur(void* arg){
         write(joueurs[i], gagnant_str, 1);
     }
     free(gagnant_str);
+
+    //TODO on ferme les connections
     return NULL;
 }
 
-
+//TODO clear le buffer après chaque read
 void* client(void* arg){
-    server_partie_info_t* info = (server_partie_info_t*) arg;
+    client_partie_info_t* info = (client_partie_info_t*) arg;
     int nb_joueur = info->nb_joueur;
     int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
+    int joueur = info->joueur;
     char* port = info->port;
     char* hostname = info->hostname;
 
@@ -192,23 +208,128 @@ void* client(void* arg){
         printf("Erreur lors de la connexion au serveur\n");
         return NULL;
     }
-    char buffer[64];
-    int n = read(clientfd, buffer, 64);
-    printf("Client lit: %s\n", buffer);
-    //on repond au serveur STOP
-    write(clientfd, "STOP", 4);
-    close(clientfd);
+
+    bool init_fini = false;
+    while(!init_fini){
+        char buffer[64];
+        int n = read(clientfd, buffer, 64);
+        
+        if(strcmp(buffer, "who") == 0){
+            printf("[Client] recoit who\n");
+            char* player_number = malloc(sizeof(char)*(nb_joueur)); //TODO on veut écrire le numéro du joueur donc on a besoin de nb_joueur/10 caractères
+            int s = int_to_ascii(joueur, player_number);
+            printf("[Client] envoie %s avec %d\n", player_number, s);
+            write(clientfd, player_number, s);
+            free(player_number);
+            continue;
+        }
+
+        if(strcmp(buffer, "all_players_ok") == 0){
+            printf("[Client] recoit all_players_ok\n");
+            //on a tous les joueurs, on peut commencer à placer les pions
+            continue;
+        }   
+
+        if(strcmp(buffer, "place") == 0){
+            for(int i = 0; i < nb_herisson_par_joueur; i++){
+                char bufferX[32];
+                char bufferY[32];
+                int x = 2; //TODO: lire les coordonnées avec ask_user
+                int y = 3;
+                int_to_ascii(x, bufferX);
+                int_to_ascii(y, bufferY);
+                write(clientfd, bufferX, 32);
+                write(clientfd, bufferY, 32);
+            }
+            continue;
+        }
+
+        if(strcmp(buffer, "coo") == 0){
+            char player_number[32];
+            char bufferX[32];
+            char bufferY[32];
+            int n = read(clientfd, player_number, 32);
+            int x = read(clientfd, bufferX, 32);
+            int y = read(clientfd, bufferY, 32);
+            //TODO on a les coordonnées du joueur player_number faut les utiliser pour initialiser le plateau
+            continue;
+        }
+
+        if(strcmp(buffer, "start") == 0){
+            init_fini = true;
+            //on peut commencer à jouer
+            break;;
+        }
+
+        printf("[Client] recoit %s qui sera ignoré !\n", buffer);
+    }
+
+    char gagnant[32];
+    bool partie_finie = false;
+    while(!partie_finie){
+        //on attend de lire "play"
+        char buffer[32];
+        int n = read(clientfd, buffer, 32);
+        if(strcmp(buffer, "play") == 0){
+            //on demande au joueur de jouer
+            int x = 2; //TODO: lire les coordonnées avec ask_user
+            int y = 3;
+            char bufferX[32];
+            char bufferY[32];
+            int_to_ascii(x, bufferX);
+            int_to_ascii(y, bufferY);
+            write(clientfd, bufferX, 32);
+            write(clientfd, bufferY, 32);
+            //TODO: si on a gagné on envoie "win" sinon "next"
+            write(clientfd, "next", 4);
+            continue;
+        }
+
+        if(strcmp(buffer, "move") == 0){
+            char player_number[32];
+            char bufferX[32];
+            char bufferY[32];
+            int n = read(clientfd, player_number, 32);
+            int x = read(clientfd, bufferX, 32);
+            int y = read(clientfd, bufferY, 32);
+            //TODO on a les coordonnées du joueur player_number faut les utiliser pour mettre à jour le plateau
+            continue;
+        }
+
+        if(strcmp(buffer, "win") == 0){
+            int n = read(clientfd, gagnant, 32);
+            partie_finie = true;
+            break;
+        }
+    }
+
+    printf("Partie finie\n");
+    printf("le gagnant est: %s\n", gagnant);
+    
+
     return NULL;
 }
 
 int main(){
+    server_partie_info_t info;
+    info.nb_joueur = 1;
+    info.nb_herisson_par_joueur = 1;
+    info.port = "8080";
+    info.hostname = "localhost";
+
+    client_partie_info_t info_client;
+    info_client.nb_joueur = 1;
+    info_client.nb_herisson_par_joueur = 1;
+    info_client.joueur = 0;
+    info_client.port = "8080";
+    info_client.hostname = "localhost";
 
     pthread_t c, serv;
-    //printf("On lance le thread serveur: \n");
-    //pthread_create(&serv, NULL, serveur, NULL);
-    //printf("On lance le thread client: \n");
-    //pthread_create(&c, NULL, client, NULL);
-    //pthread_join(serv, NULL);
+    printf("On lance le thread serveur: \n");
+    pthread_create(&serv, NULL, server, &info);
+    printf("On lance le thread client: \n");
+    pthread_create(&c, NULL, client, &info_client);
+    pthread_join(serv, NULL);
     //close(c);
     return 0;
 }

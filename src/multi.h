@@ -41,7 +41,14 @@ struct server_partie_info {
 };
 typedef struct server_partie_info server_partie_info_t;
 
-
+struct client_partie_info {
+    int nb_joueur;
+    int nb_herisson_par_joueur;
+    int joueur;
+    char* port;
+    char* hostname;
+};
+typedef struct client_partie_info client_partie_info_t;
 
 
 
