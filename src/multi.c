@@ -211,6 +211,7 @@ void * server(void* arg){
     return NULL;
 }*/
 
+
 //TODO clear le buffer après chaque read
 void* client(void* arg){
     client_partie_info_t* info = (client_partie_info_t*) arg;
@@ -219,6 +220,8 @@ void* client(void* arg){
     int joueur = info->joueur;
     char* port = info->port;
     char* hostname = info->hostname;
+
+    plateau_t * p = creer_plateau(NB_LIGNES, NB_COLONNES);
 
     printf("Client lancé\n");
     int clientfd = open_clientfd(hostname, port);
