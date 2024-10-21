@@ -251,6 +251,40 @@ info_placement_herisson_t* serv_to_coo(char* serv, int nb_herissons, int player)
     return res;
 }
 
+//Format d'un coup: [N|W]&[H|B|A]&player&x&y&c avec N next W win H/B/A pour haut/bas/aucun et (x,y) 
+char* formatter_coup(info_coup_t *coup){
+    char* res = malloc(sizeof(char)*32);
+    int index = 0;
+    if(coup->result == -1){
+        res[index] = 'N';
+    }else{
+        res[index] = 'W';
+    }
+    index++;
+    res[index] = '&';
+    index++;
+    if(coup->deplacement_vertical == 0){
+        res[index] = 'A';
+    }else if(coup->deplacement_vertical == 1){
+        res[index] = 'H';
+    }else{
+        res[index] = 'B';
+    }
+    index++;
+    res[index] = '&';
+    index++;
+    index += int_to_ascii(coup->joueur, res+index);
+    res[index] = '&';
+    index++;
+    index += int_to_ascii(coup->coo_vert->ligne, res+index);
+    res[index] = '&';
+    index++;
+    index += int_to_ascii(coup->coo_vert->colonne, res+index);
+    res[index] = '&';
+    index++;
+    index += int_to_ascii(coup->deplacement_colonne, res+index);
+    return res;
+}
 
 //TODO clear le buffer après chaque read
 void* client(void* arg){
@@ -346,7 +380,7 @@ void* client(void* arg){
             //on demande au joueur de jouer et on transforme le coup en "Nx&y&...&win" (next) ou "Wx&y&..." (win)
             //attention un "move gagnant" c'est juste le dernier move jouable, faut encore calculer les gagnants
             //TODO: formater le coup en "Nx&y&...&win" ou "Wx&y&..." 
-            //Format d'un coup: [N|W]&[H|B|A]&x&y&c avec N next W win H/B/A pour haut/bas/aucun et (x,y) 
+//Format d'un coup: [N|W]&[H|B|A]&player&x&y&c avec N next W win H/B/A pour haut/bas/aucun et (x,y) 
             //les coo du herisson à déplacer verticalement et c la colonne qui fait avancer 
             board_print(p);
             info_coup_t * info = jouer_coup(p,joueur);
