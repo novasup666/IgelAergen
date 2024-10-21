@@ -399,15 +399,22 @@ void game_loop(plateau_t *p){
 
 
 
-int main(){
+int main(int argc, char*argv){
     srand(time(NULL)); //initialise le générateur de nombre aléatoire, à appeler une seule fois !
     
     printf("\n\n<<<<<<< < < <  <  Bienvenue dans Igel Aergen  >  > > > >>>>>>>\n\n");
     printf("Ce programme permet de jouer à ce jeu de 3 façons différentes\n- En mode classique: tout les joueurs jouent sur la machine\n- En mode multi:\n    - un joueur est le serveur\n    - les autres sont les clients\n");
 
-    printf("Entrez le mode de jeu désiré : \n 1: classique    | 2: serveur    | 3: client\n>");
+    int mode;
 
-    int mode = readInt(2);
+    if (argc == 2){
+        mode = (int) (argv[1] - '0');
+    }
+    else{
+        printf("Entrez le mode de jeu désiré : \n 1: classique    | 2: serveur    | 3: client\n>");
+        mode = readInt(2);
+    }
+
 
     if (mode == 1){
         info_partie_t* info = demander_info_partie(NB_LIGNES, NB_COLONNES);
