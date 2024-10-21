@@ -39,6 +39,7 @@ typedef struct info_partie_s info_partie_t;
 struct info_coup{
     int result;
     int joueur;
+    int de; //valeur du dès, ligne du herisson à déplacer
     int deplacement_vertical; //0 si non, 1 si haut, 2 si bas
     int deplacement_colonne; //colonne du herisson à avancer, -1 si pas possible
     coo_t* coo_vert; //coordonnées du herisson à déplacer verticalement 

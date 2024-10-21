@@ -12,7 +12,7 @@
 #define NB_COLONNES 4
 
 char board_top (plateau_t*p, int line, int col);
-
+char board_pop(plateau_t* p, int line, int col);
 void board_push(plateau_t* p, int line, int col, char ctn);
 
 char player_to_herisson(int joueur);
