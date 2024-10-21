@@ -274,8 +274,20 @@ void* client(void* arg){
         if(strcmp(buffer, "place\n") == 0){
             printf("[Client] recoit place\n");
             //TODO envoyer x1&x2&... pour placer les pions
-            char *placement_temp = "1&2";
-            write(clientfd, placement_temp, 4);
+            printf("Indiquez la colonne où vous souhaitez placer l'hérisson\n")
+            char *placement;
+            for(int i = 0; i <nb_herisson_par_joueur;i++){
+                int coords = demander_coo_plateau(p,joueur,NB_COLONNES,false);
+                if (i == 0){
+                    asprintf(&placement,"%d",coords);
+                }
+                else{
+                    asprintf(&placement,"%s&%d", placement,coords);  
+                }
+            }
+
+
+            write(clientfd, placement, 4);
             continue;
         }
 

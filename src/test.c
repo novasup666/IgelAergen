@@ -1,9 +1,11 @@
 #include <stdio.h>
 
 int main(void){
-    char str[17];
-    printf("entre une phrase\n>");
-    scanf("%s",&str);
-    printf("l'ip est:\n %s",str);
+    int entier;
+    printf("entre un entier\n>");
+    scanf("%d",&entier);
+    char * string;
+    asprintf(&string,"je mets l'entier entre les chevrons >%d<%d\n", entier,entier);
+    printf("%s",string);
 
 }
