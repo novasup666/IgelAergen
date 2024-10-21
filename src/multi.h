@@ -47,7 +47,8 @@ struct client_partie_info {
     int nb_herisson_par_joueur;
     int joueur;
     char* port;
-    char* hostname;
+    char* hostname;*
+    info_partie_t* info;
 };
 typedef struct client_partie_info client_partie_info_t;
 

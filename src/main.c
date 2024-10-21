@@ -258,10 +258,14 @@ bool is_coup_possible(plateau_t* p, int ligne){
 //-2 si il peut pas jouer
 //-1 si il joue et que aucun herisson arrive sur la dernière colonne
 //player si le herisson de player arrive sur la dernière colonne
+<<<<<<< HEAD
 
 // /!\ IL FAUT CHANGER LES APPELS à jouer_coup
 
 int jouer_coup(plateau_t *p, int joueur, int*infos_coup){
+=======
+info_coup_t* jouer_coup(plateau_t *p, int joueur){
+>>>>>>> f887103 (some fix main/serv)
     printf("DEBUG: joueur %d\n", joueur);
     int de = lancer_de();
     //TODO remove ce fix hideux
@@ -269,6 +273,14 @@ int jouer_coup(plateau_t *p, int joueur, int*infos_coup){
         printf("Erreur, le dé a donné un nombre trop grand (%d) pour le nombre de lignes (%d)\n\n", de, p->nb_lignes);
         de=lancer_de();
     }
+
+    info_coup_t* info = malloc(sizeof(info_coup_t));
+    info->joueur = joueur;
+    info->result = -1;
+    info->deplacement_vertical = -1;
+    info->deplacement_colonne = -1;
+    info->coo_vert = NULL;
+
 
     printf("Le joueur %d a lancé un %d et peu donc faire avancer un herisson de la ligne %d\n\n", joueur, de, de);
     
@@ -281,9 +293,12 @@ int jouer_coup(plateau_t *p, int joueur, int*infos_coup){
         if(c==NULL){
             printf("Joueur %d, vous avez choisi de ne pas déplacer de herisson verticalement\n", joueur);
             choix_vertical_valide = true;
+            info->deplacement_vertical = 0;
         }
         else{
             int deplacement = demander_deplacement(p, joueur); //1=haut 2=bas
+            info->deplacement_vertical = deplacement;
+            info->coo_vert = c;
             if(deplacement == 1){
                 if(c->ligne <= 0){
                     printf("Erreur, vous ne pouvez pas déplacer le herisson %d vers le haut\n", joueur);
@@ -320,7 +335,8 @@ int jouer_coup(plateau_t *p, int joueur, int*infos_coup){
 
     if(!is_coup_possible(p, de)){
         printf("Joueur %d: vous ne pouvez pas jouer de coup, vous passez votre tour !\n", joueur);
-        return -2;
+        info->result = -2;
+        return info;
     }
 
     //le joueur doit donc déplacer un herisson horizontalement de la ligne déterminée par le dé
@@ -328,6 +344,7 @@ int jouer_coup(plateau_t *p, int joueur, int*infos_coup){
     while(!choix_horizontal_valide){
         printf("Joueur %d: Selectionnez un herisson à déplacer horizontalement sur la ligne %d (ceci est obligatoire pour les ects):\n", joueur, de); //TODO remove la vanne claqué sur les ects
         int colonne = demander_coo_plateau(joueur, p->nb_colonnes-1, false, true); //on ne veut pas bouger un herisson sur la dernière colonne
+        info->deplacement_colonne = colonne;
         if(board_is_empty(p, de, colonne)){
             printf("Erreur, la case (%d, %d) est vide\n", de, colonne);
         }
@@ -339,11 +356,13 @@ int jouer_coup(plateau_t *p, int joueur, int*infos_coup){
             board_push(p, de, colonne+1, board_pop(p, de, colonne));
             if(colonne+1 == p->nb_colonnes -1){
                 return_value = herisson_to_player(board_top(p, de, colonne+1));
+                info->result = return_value;
             }
             choix_horizontal_valide = true;
         }
     }
-    return return_value;
+    
+    return info;
 }
 
 
@@ -361,8 +380,9 @@ void game_loop(plateau_t *p){
         printf("\n\n\n\n\n\n\n");
         printf("\n\n<<<<<<< < < <  <  Nouveau Tour  >  > > > >>>>>>>\n\n\n");
         board_print(p);
-        int r = jouer_coup(p,current_player);
- 
+        info_coup_t * info = jouer_coup(p,current_player);
+        int r = info->result;
+
         if (r >= 0 ){
             joueurs_score[r]++;
             if (joueurs_score[r] >= p->nb_herissons_par_joueurs -1){
@@ -372,6 +392,8 @@ void game_loop(plateau_t *p){
 
         current_player ++;
         current_player %= p->nb_joueurs;
+
+        free(info);
     }
 
     board_print(p);

@@ -36,5 +36,14 @@ struct info_partie_s{
 };
 typedef struct info_partie_s info_partie_t;
 
+struct info_coup{
+    int result;
+    int joueur;
+    int deplacement_vertical; //0 si non, 1 si haut, 2 si bas
+    int deplacement_colonne; //colonne du herisson à avancer, -1 si pas possible
+    coo_t* coo_vert; //coordonnées du herisson à déplacer verticalement 
+};
+typedef struct info_coup info_coup_t;
+
 
 #endif

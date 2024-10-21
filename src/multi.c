@@ -234,6 +234,7 @@ void* client(void* arg){
     int joueur = info->joueur;
     char* port = info->port;
     char* hostname = info->hostname;
+    info_partie_t* info_partie = info->info;
 
     plateau_t * p = creer_plateau(NB_LIGNES, NB_COLONNES);
 
@@ -255,7 +256,7 @@ void* client(void* arg){
         
         if(strcmp(buffer, "who\n") == 0){
             printf("[Client] recoit who\n");
-            char* player_number = malloc(sizeof(char)*(nb_joueur+1)); //TODO on veut écrire le numéro du joueur donc on a besoin de nb_joueur/10 caractères
+            char* player_number = malloc(sizeof(char)*(nb_joueur+1)); //on veut écrire le numéro du joueur donc on a besoin de  partie entière sup de nb_joueur/10 caractères mais pour simplifier on prend nb_joueur+1
             int s = int_to_ascii(joueur, player_number);
             player_number[s] = '\0';
             printf("[Client] envoie %s\n", player_number);
@@ -272,6 +273,7 @@ void* client(void* arg){
 
         if(strcmp(buffer, "place\n") == 0){
             printf("[Client] recoit place\n");
+            coo_t * coo = demander_coo(p, joueur, true, true);
             //TODO envoyer x1&x2&... pour placer les pions
             printf("Indiquez la colonne où vous souhaitez placer l'hérisson\n")
             char *placement;
@@ -326,9 +328,15 @@ void* client(void* arg){
             //TODO: formater le coup en "Nx&y&...&win" ou "Wx&y&..." 
             //Format d'un coup: [N|W]&[H|B|A]&x&y&c avec N next W win H/B/A pour haut/bas/aucun et (x,y) 
             //les coo du herisson à déplacer verticalement et c la colonne qui fait avancer 
+<<<<<<< HEAD
             
             int *infos_coup = calloc(4,sizeof(int));
             jouer()
+=======
+            info_coup_t * info = jouer_coup(p,current_player);
+            //TODO fonction pour formater le coup
+            char* coup = "W&1&2";
+>>>>>>> f887103 (some fix main/serv)
             write(clientfd, coup, strlen(coup));
             continue;
         }

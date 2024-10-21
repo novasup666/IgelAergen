@@ -27,4 +27,10 @@ bool is_herisson_last(plateau_t* p, int joueur, int ligne, int colonne);
 plateau_t* creer_plateau(int nb_lignes, int nb_colonnes);
 void liberer_plateau(plateau_t* p);
 
+//fonction du jeu
+info_coup_t* jouer_coup(plateau_t *p, int joueur);
+
+//fonction d'affichage
+void board_print(plateau_t * p);
+
 #endif
