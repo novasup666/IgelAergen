@@ -204,27 +204,87 @@ int lookup(char* str, char delim){
     return -1;
 }   
 
-char** cut(char* str, char delim){
-    char** res = malloc(sizeof(char*)*2);
-    int index = lookup(str, delim);
-    if(index == -1){
-        res[0] = NULL;
-        res[1] = str;
-        return res;
-    }
-    res[0] = malloc(sizeof(char)*(index+1));
-    res[1] = malloc(sizeof(char)*(strlen(str)-index));
-    for(int i = 0; i < index; i++){
-        res[0][i] = str[i];
-    }
-    res[0][index] = '\0';
-    for(int i = index+1; i < strlen(str); i++){
-        res[1][i-index-1] = str[i];
-    }
-    res[1][strlen(str)-index-1] = '\0';
+char* coo_to_serv(info_placement_herisson_t* placement_herisson){
+    printf("COO TO SERV %d\n", placement_herisson->nb_herissons);
+
+    char * res = malloc(sizeof(char)*placement_herisson->nb_herissons*2);
+    int index = 0;
+    for(int h = 0; h<placement_herisson->nb_herissons-1; h++){
+        index += int_to_ascii(placement_herisson->lignes[h], res+index);
+        res[index] = '&';
+        index++;
+    }   
+    int_to_ascii(placement_herisson->lignes[placement_herisson->nb_herissons-1], res+index);
     return res;
 }
 
+info_placement_herisson_t* serv_to_coo(char* serv, int nb_herissons, int player){
+    info_placement_herisson_t* res = malloc(sizeof(info_placement_herisson_t));
+    res->joueur = player;
+    res->nb_herissons = nb_herissons;
+    int* lignes = malloc(sizeof(int)*nb_herissons);
+    int index = 0;
+    bool fini = false;
+    int index_placement = 0;
+
+    printf("SERVTO CO RECOIT %s\n", serv);
+    while(!fini){
+        int next = lookup(serv+index, '&');
+        if(next == -1){
+            next = strlen(serv);
+            fini = true;
+        }
+        char* buffer = malloc(sizeof(char)*(next+1));
+        strncpy(buffer, serv+index, next);
+        buffer[next] = '\0';
+        printf("buffer: %s\n\n\n", buffer);
+        lignes[index_placement] = atoi(buffer);
+        free(buffer);
+        index += next+1;
+        index_placement++;
+    }
+    printf("servtoco\n");
+    for(int i = 0; i < nb_herissons; i++){
+        printf("ligne %d\n", lignes[i]);
+    }
+    res->lignes = lignes;
+    return res;
+}
+
+//Format d'un coup: [N|W]&[H|B|A]&player&x&y&c avec N next W win H/B/A pour haut/bas/aucun et (x,y) 
+char* formatter_coup(info_coup_t *coup){
+    char* res = malloc(sizeof(char)*32);
+    int index = 0;
+    if(coup->result == -1){
+        res[index] = 'N';
+    }else{
+        res[index] = 'W';
+    }
+    index++;
+    res[index] = '&';
+    index++;
+    if(coup->deplacement_vertical == 0){
+        res[index] = 'A';
+    }else if(coup->deplacement_vertical == 1){
+        res[index] = 'H';
+    }else{
+        res[index] = 'B';
+    }
+    index++;
+    res[index] = '&';
+    index++;
+    index += int_to_ascii(coup->joueur, res+index);
+    res[index] = '&';
+    index++;
+    index += int_to_ascii(coup->coo_vert->ligne, res+index);
+    res[index] = '&';
+    index++;
+    index += int_to_ascii(coup->coo_vert->colonne, res+index);
+    res[index] = '&';
+    index++;
+    index += int_to_ascii(coup->deplacement_colonne, res+index);
+    return res;
+}
 
 //TODO clear le buffer après chaque read
 void* client(void* arg){
@@ -237,6 +297,9 @@ void* client(void* arg){
     info_partie_t* info_partie = info->info;
 
     plateau_t * p = creer_plateau(NB_LIGNES, NB_COLONNES);
+    int nb_lignes = NB_LIGNES; //TODO peut être utiliser la struct client_info_partie_t pour ça 
+    int nb_colonnes = NB_COLONNES;
+
 
     printf("Client lancé, se connete à %s:%s\n", hostname, port);
     int clientfd = open_clientfd(hostname, port);
@@ -246,8 +309,8 @@ void* client(void* arg){
         clientfd = open_clientfd(hostname, port);
     }
 
-    bool init_fini = false;
-    while(!init_fini){
+    bool fini = false;
+    while(!fini){
         char buffer[64];
         clear_buffer(buffer, 64);
         int n = read(clientfd, buffer, 64);
@@ -273,52 +336,43 @@ void* client(void* arg){
 
         if(strcmp(buffer, "place\n") == 0){
             printf("[Client] recoit place\n");
-            coo_t * coo = demander_coo(p, joueur, true, true);
-            //TODO envoyer x1&x2&... pour placer les pions
-            printf("Indiquez la colonne où vous souhaitez placer l'hérisson\n")
-            char *placement;
-            printf("=========================================================\n");
-            printf(" Vous allez placer vos herissons de depart !\n");
-            for(int herisson = 0; herisson<nb_herrisons_par_joueurs; herisson++){
-                printf("Placer le herisson %d:\n>", herisson);
-                int c = -1;
-                while((c=readInt(TAILLE_MAX_ENTIER)) <0 || c >= nb_lignes){
-                    printf("Erreur, joueur %d, veuillez indiquer un nombre entre 0 et %d !\n", joueur, nb_lignes-1);
-                    printf("Placer le herisson %d:\n>", herisson);
-                }
-                if (herisson == 0){
-                    asprintf(&placement,"%d",c);
-                }
-                else{
-                    asprintf(&placement,"%s&%d", placement,c);  
-                }
-            }            
+            info_placement_herisson_t * placement_herisson = demander_placement_herisson(joueur, nb_herisson_par_joueur, nb_lignes);
+            //envoyer x1&x2&...&n pour placer les pions
+            char * placement = coo_to_serv(placement_herisson);
+            printf("On va envoyer %s\n", placement);
 
-            write(clientfd, placement, 4);
+
+            free(placement_herisson->lignes);
+            free(placement_herisson);
+
+            write(clientfd, placement, strlen(placement));
+            free(placement);
             continue;
         }
 
         if(strcmp(buffer, "placed\n") == 0){
-            //TODO reçoit joueur&x1&x2&... et les place sur le plateau
+            //reçoit joueur&x1&x2&... et les place sur le plateau
             char buffer2[32];
             int n = read(clientfd, buffer2, 32);
             printf("[Client] recoit placed: %s\n", buffer2);
-            int placeur = buffer2[0];
-            int i = 1;
-            while (buffer2[i]!='\0'){
-                if (buffer2[i]!='&'){
-                    board_push(p,0,(int)(buffer2[i]-'0'), player_to_herisson(placeur));
-                }
+            info_placement_herisson_t * placement_herisson = serv_to_coo(buffer2, nb_herisson_par_joueur, joueur);
+
+
+            for(int h=0; h<placement_herisson->nb_herissons; h++){
+                board_push(p, placement_herisson->lignes[h], 0, player_to_herisson(joueur));
             }
+            board_print(p);
+            free(placement_herisson->lignes);
+            free(placement_herisson);
+
             continue;
         }
 
 
         if(strcmp(buffer, "start\n") == 0){
             printf("[Client] recoit start !\n");
-            init_fini = true;
+            board_print(p);
             //on peut commencer à jouer
-            break;;
         }
 
         if(strcmp(buffer, "play\n") == 0){
@@ -326,9 +380,10 @@ void* client(void* arg){
             //on demande au joueur de jouer et on transforme le coup en "Nx&y&...&win" (next) ou "Wx&y&..." (win)
             //attention un "move gagnant" c'est juste le dernier move jouable, faut encore calculer les gagnants
             //TODO: formater le coup en "Nx&y&...&win" ou "Wx&y&..." 
-            //Format d'un coup: [N|W]&[H|B|A]&x&y&c avec N next W win H/B/A pour haut/bas/aucun et (x,y) 
+//Format d'un coup: [N|W]&[H|B|A]&player&x&y&c avec N next W win H/B/A pour haut/bas/aucun et (x,y) 
             //les coo du herisson à déplacer verticalement et c la colonne qui fait avancer 
-            info_coup_t * info = jouer_coup(p,current_player);
+            board_print(p);
+            info_coup_t * info = jouer_coup(p,joueur);
             //TODO fonction pour formater le coup
             char* coup = "W&1&2";
             write(clientfd, coup, strlen(coup));
@@ -348,10 +403,17 @@ void* client(void* arg){
         if(strcmp(buffer, "win\n") == 0){
             //TODO on a reçu un message de fin de partie, faut calculer les gagnants
             printf("[Client] recoit win\n");
+            fini = true;
             break;
         }
 
-        printf("[Client] recoit '%s' qui sera ignoré !\n", buffer);
+        printf("[Client] recoit '%s' qui sera ignoré \n", buffer);
+       /* char** res = cut(buffer, '\n');
+        free(res[0]);
+        strcpy(buffer, res[1]);
+        free(res[1]);
+        free(res);*/
+
     }
 
 

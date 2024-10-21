@@ -5,6 +5,24 @@
 #include "main.h"
 #include "ask_user.h"
 
+info_placement_herisson_t * demander_placement_herisson(int joueur, int nb_herissons, int nb_lignes){
+    info_placement_herisson_t * info = malloc(sizeof(info_placement_herisson_t));
+    info->joueur = joueur;
+    info->nb_herissons = nb_herissons;
+    info->lignes = malloc(nb_herissons*sizeof(int));
+    printf("Joueur %d, vous allez placer vos herissons de depart !\n", joueur);
+    for(int i = 0; i<nb_herissons; i++){
+        printf("Placer le herisson %d:\n>", i);
+        int c = -1;
+        while((c=readInt(TAILLE_MAX_ENTIER)) <0 || c >= nb_lignes){
+            printf("Erreur, joueur %d, veuillez indiquer un nombre entre 0 et %d !\n", joueur, nb_lignes-1);
+            printf("Placer le herisson %d:\n>", i);
+        }
+        info->lignes[i] = c;
+    }
+    return info;
+}
+
 info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
     info_partie_t* info = calloc(1, sizeof(info_partie_t));
     
@@ -33,17 +51,15 @@ info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
     
     for(int joueur = 0; joueur < nb_joueurs; joueur++){
         printf("=========================================================\n");
-        printf("Joueur %d: Vous allez placer vos herissons de depart !\n", joueur);
-        for(int herisson = 0; herisson<nb_herrisons_par_joueurs; herisson++){
-            printf("Placer le herisson %d:\n>", herisson);
-            int c = -1;
-            while((c=readInt(TAILLE_MAX_ENTIER)) <0 || c >= nb_lignes){
-                printf("Erreur, joueur %d, veuillez indiquer un nombre entre 0 et %d !\n", joueur, nb_lignes-1);
-                printf("Placer le herisson %d:\n>", herisson);
+        
+            info_placement_herisson_t * info_herisson = demander_placement_herisson(joueur, nb_herrisons_par_joueurs, nb_lignes);
+            for(int herisson = 0; herisson < nb_herrisons_par_joueurs; herisson++){
+                placement_herisson[joueur][herisson] = info_herisson->lignes[herisson];
             }
-            placement_herisson[joueur][herisson]=c;
+            free(info_herisson->lignes);
+            free(info_herisson);
         }
-    }
+
     info->nb_joueurs = nb_joueurs;
     info->nb_herissons_par_joueurs = nb_herrisons_par_joueurs;
     info->placement_herissons = placement_herisson;

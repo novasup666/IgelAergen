@@ -2,6 +2,7 @@
 #define MULTI_H
 
 #include "gametype.h"
+#include "ask_user.h"
 #include "main.h"
 
 #include <sys/types.h>
@@ -47,7 +48,7 @@ struct client_partie_info {
     int nb_herisson_par_joueur;
     int joueur;
     char* port;
-    char* hostname;*
+    char* hostname;
     info_partie_t* info;
 };
 typedef struct client_partie_info client_partie_info_t;

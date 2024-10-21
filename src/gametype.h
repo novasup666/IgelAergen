@@ -45,5 +45,11 @@ struct info_coup{
 };
 typedef struct info_coup info_coup_t;
 
+struct info_placement_herisson{
+    int joueur;
+    int nb_herissons;
+    int* lignes;
+};
+typedef struct info_placement_herisson info_placement_herisson_t;
 
 #endif
