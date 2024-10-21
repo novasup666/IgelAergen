@@ -18,7 +18,7 @@ FILE* log_file = NULL;
 
 
 
-/* fonction d'exemple pour  ce familiariser avec les sockets, je le delete après TODO DELETE ! 
+/* fonction d'exemple pour  ce familiariser avec les sockets, je le delete press enter to retr enter to retrprès TODO DELETE ! 
 void* serveur_test(void* arg){
     printf("Serveur lancé\n");
     int listenfd = -1;
@@ -329,13 +329,13 @@ void* client(void* arg){
         }
 
         if(strcmp(buffer, "all_players_ok\n") == 0){
-            printf("[Client] recoit all_players_ok\n");
+            printf("[Client] reçoit all_players_ok\n");
             //on a tous les joueurs, on peut commencer à placer les pions
             continue;
         }   
 
         if(strcmp(buffer, "place\n") == 0){
-            printf("[Client] recoit place\n");
+            printf("[Client] reçoit place\n");
             info_placement_herisson_t * placement_herisson = demander_placement_herisson(joueur, nb_herisson_par_joueur, nb_lignes);
             //envoyer x1&x2&...&n pour placer les pions
             char * placement = coo_to_serv(placement_herisson);

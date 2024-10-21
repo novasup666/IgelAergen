@@ -1,5 +1,5 @@
 /*
-Ressource conseillé par le prof de réseau !
+Ressource conseillée par le prof de réseau !
 
 !!!! Ce code n'a pas été écrit par nous !!!!
 

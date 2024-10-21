@@ -1,22 +1,37 @@
-# Rapport - Igel Aergen
+# Igel Aergen - Adil Oubninte, Noé Vincent
+Temps dévoué au projet :
+- Adil Oubninte: env. x heures
 
-Adil Oubninte: temps passé env. x heures
-
-Noé Vincent: temps passé env. 30 heures
+- Noé Vincent: env. 30 heures
 
 ## I. Introduction
 
-Igel Aergen est un jeux de plateau multijoueur, l'objectif içi à été de produire un programme C permettant de jouer à ce jeu dans un terminal d'ordinateur en multijoueur local ou réseau. Ce projet permet d'explorer différentes façettes et différents niveaux de la programmation C, allant du réseau à la gestion de structures abstraites, de plus il nous aura permis d'utiliser à nouveau des outils permettant le bon développement d'un projet: la compilation automatisée avec CMake et la collaboration avec Git.
+Igel Aergen est un jeux de plateau se jouant à plusieurs (2 à 6 joueurs normalement), l'objectif içi à été de produire un programme C permettant de jouer à ce jeu au travers d'un seul et même terminal d'ordinateur ou, dans notre cas, en réseau. 
+
+Ce projet permet d'explorer différentes façettes et différents niveaux de la programmation C, allant du réseau à la gestion de structures abstraites. De plus, il nous aura permis d'utiliser et de nous familiariser encore un peu plus avec des outils permettant le bon développement d'un projet: la compilation automatisée avec CMake et la collaboration avec Git.
 
 ## II. Première (petite) extension - Resizable Char Array
-Dans un souci d'économie de la mémoire de résilience fâce à des cas extrêmes (type 25 joueurs ayant 300 hérissons chacuns) nous avons décidé d'implémenter les petites piles qui constituent les cases à l'aide de tableaux dynamique. Un module a donc été créé ```ResizableCharArray``` qui permet le type ```rca_t``` utilisé donc pour stocker les hérissons situés sur une case. L'implémentation est classique, les tableaux sont initialisés de sorte à n'utiliser que peut de mémoire, l'espace alloué est doublé de taille à chaque dépassement de la capacité.
+### Objectif
+Dans un souci d'économie de la mémoire et de résilience fâce à des cas extrêmes (comme des tests à 25 joueurs ayant 300 hérissons chacuns) nous avons décidé d'implémenter les petites piles qui constituent les cases à l'aide de tableaux dynamique. 
+
+### Réalisation
+Un module ```ResizableCharArray``` a  été créé  qui permet le type ```rca_t```. Celui-ci est utilisé pour stocker les hérissons situés sur une case. L'implémentation est classique, les tableaux sont initialisés de sorte à n'utiliser que peut de mémoire, l'espace alloué est doublé de taille à chaque dépassement de la capacité. Ceci permet d'éviter d'allouer, pour chaque case, l'espace nécessaire à stocker les hérissons dans le pire cas possible, c'est-à-dire tout les hérissons sur la même case.
 
 ## III. Principale extension - Mode multijoueur en réseau
 
 Afin de permettre un mode multijoueur plus confortable, pour les joueurs, nous avont décidé d'implémenter une solution permettant de jouer à plusieurs depuis différentes machines sur le même réseau local (ou sur des réseaux différents mais dont des ports spécifiques ont été ouverts).
 
-Pour ce faire, une architecture client serveur à été choisie. Pour être plus précis, le serveur est aussi joueur, il executera donc en parallèle : 
-- un processus "serveur" permettant d'orchestrer les différentes phases du jeux et la synchronisation des plateaux entre les joueurs.
-- un processus "client" connecté au serveur hébergé sur la même machine, permettant au propriétaire de la machine de jouer aussi.
+Pour ce faire, une architecture client-serveur à été choisie. 
+
+Le client executera la fonction ```client()``` de ```multi.c```, celle-ci prends comme argument une structure portant diverses informations de connection et paramêtres de la partie.
+
+Le serveur, lui, à un rôle un peu plus complexe. En effet, le serveur est aussi joueur, il executera donc en parallèle : 
+- la fonction ```serveur()``` (aussi située dans ```multi.c```) permettant d'orchestrer les différentes phases du jeux et la synchronisation des plateaux entre les joueurs.
+- la fonction ```client()``` connectée au serveur hébergé sur la même machine, permettant au propriétaire de la machine de jouer aussi.
+
+La communication entre clients et serveur se fait au travers de sockets réseau, à l'aide du module ```csapp.h```.
+Ainsi cette extension fait intervenir 2 composantes imprévues pour le projet: le gestion de sockets et le multithreading.
 
 
+## IV. Bibliographie
+- Module ```csapp.h```, Carnegie Mellon University, [lien vers csapp.c](https://csapp.cs.cmu.edu/3e/ics3/code/src/csapp.c), [lien pour csapp.h](https://csapp.cs.cmu.edu/3e/ics3/code/src/csapp.h)
