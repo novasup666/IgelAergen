@@ -328,15 +328,9 @@ void* client(void* arg){
             //TODO: formater le coup en "Nx&y&...&win" ou "Wx&y&..." 
             //Format d'un coup: [N|W]&[H|B|A]&x&y&c avec N next W win H/B/A pour haut/bas/aucun et (x,y) 
             //les coo du herisson à déplacer verticalement et c la colonne qui fait avancer 
-<<<<<<< HEAD
-            
-            int *infos_coup = calloc(4,sizeof(int));
-            jouer()
-=======
             info_coup_t * info = jouer_coup(p,current_player);
             //TODO fonction pour formater le coup
             char* coup = "W&1&2";
->>>>>>> f887103 (some fix main/serv)
             write(clientfd, coup, strlen(coup));
             continue;
         }
