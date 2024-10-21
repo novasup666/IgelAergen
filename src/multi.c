@@ -276,16 +276,22 @@ void* client(void* arg){
             //TODO envoyer x1&x2&... pour placer les pions
             printf("Indiquez la colonne où vous souhaitez placer l'hérisson\n")
             char *placement;
-            for(int i = 0; i <nb_herisson_par_joueur;i++){
-                int coords = demander_coo_plateau(p,joueur,NB_COLONNES,false);
-                if (i == 0){
-                    asprintf(&placement,"%d",coords);
+            printf("=========================================================\n");
+            printf(" Vous allez placer vos herissons de depart !\n");
+            for(int herisson = 0; herisson<nb_herrisons_par_joueurs; herisson++){
+                printf("Placer le herisson %d:\n>", herisson);
+                int c = -1;
+                while((c=readInt(TAILLE_MAX_ENTIER)) <0 || c >= nb_lignes){
+                    printf("Erreur, joueur %d, veuillez indiquer un nombre entre 0 et %d !\n", joueur, nb_lignes-1);
+                    printf("Placer le herisson %d:\n>", herisson);
+                }
+                if (herisson == 0){
+                    asprintf(&placement,"%d",c);
                 }
                 else{
-                    asprintf(&placement,"%s&%d", placement,coords);  
+                    asprintf(&placement,"%s&%d", placement,c);  
                 }
-            }
-
+            }            
 
             write(clientfd, placement, 4);
             continue;
@@ -296,6 +302,13 @@ void* client(void* arg){
             char buffer2[32];
             int n = read(clientfd, buffer2, 32);
             printf("[Client] recoit placed: %s\n", buffer2);
+            int placeur = buffer2[0];
+            int i = 1;
+            while (buffer2[i]!='\0'){
+                if (buffer2[i]!='&'){
+                    board_push(p,0,(int)(buffer2[i]-'0'), player_to_herisson(placeur));
+                }
+            }
             continue;
         }
 
@@ -314,7 +327,9 @@ void* client(void* arg){
             //TODO: formater le coup en "Nx&y&...&win" ou "Wx&y&..." 
             //Format d'un coup: [N|W]&[H|B|A]&x&y&c avec N next W win H/B/A pour haut/bas/aucun et (x,y) 
             //les coo du herisson à déplacer verticalement et c la colonne qui fait avancer 
-            char* coup = "W&1&2";
+            
+            int *infos_coup = calloc(4,sizeof(int));
+            jouer()
             write(clientfd, coup, strlen(coup));
             continue;
         }

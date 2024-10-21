@@ -33,7 +33,7 @@ info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
     
     for(int joueur = 0; joueur < nb_joueurs; joueur++){
         printf("=========================================================\n");
-        printf("Joueurs %d: Vous allez placer vos herissons de depart !\n", joueur);
+        printf("Joueur %d: Vous allez placer vos herissons de depart !\n", joueur);
         for(int herisson = 0; herisson<nb_herrisons_par_joueurs; herisson++){
             printf("Placer le herisson %d:\n>", herisson);
             int c = -1;
