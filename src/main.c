@@ -258,14 +258,7 @@ bool is_coup_possible(plateau_t* p, int ligne){
 //-2 si il peut pas jouer
 //-1 si il joue et que aucun herisson arrive sur la dernière colonne
 //player si le herisson de player arrive sur la dernière colonne
-<<<<<<< HEAD
-
-// /!\ IL FAUT CHANGER LES APPELS à jouer_coup
-
-int jouer_coup(plateau_t *p, int joueur, int*infos_coup){
-=======
 info_coup_t* jouer_coup(plateau_t *p, int joueur){
->>>>>>> f887103 (some fix main/serv)
     printf("DEBUG: joueur %d\n", joueur);
     int de = lancer_de();
     //TODO remove ce fix hideux
