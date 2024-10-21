@@ -152,13 +152,16 @@ void * serveur(void* arg){
         clear_buffer(buffer, READ_SIZE);
         int n = read(joueurs[j], buffer, nb_herisson_par_joueur*2+2); //+2 car au plus 27 joueurs
         printf("[Serveur] recoit placement de %d de valeur '%s' et de taille %d\n", j, buffer, n);
+
+        char* placed_info = calloc(READ_SIZE, sizeof(char));
+        strcpy(placed_info, "placed\n");
+        strcat(placed_info, buffer);
         for(int other_j = 0; other_j < nb_joueur; other_j++){
-                if(other_j == j){
-                    continue;
-                }
-                printf("[Serveur] envoie placement à %d de valeur '%s'\n", other_j, buffer);
-                write_log(joueurs[other_j], "placed\n", 7, true);
-                write_log(joueurs[other_j], buffer, nb_herisson_par_joueur*2+2, true);
+            if(other_j == j){
+                continue;
+            }
+            printf("[Serveur] envoie placement à %d de valeur '%s'\n", other_j, buffer);
+            write_log(joueurs[other_j], placed_info, nb_herisson_par_joueur*2+2, true);
         }
     }
 
@@ -443,12 +446,15 @@ void* client(void* arg){
             //continue;
         }   
 
-        if(strcmp(buffer, "place\n") == 0){
+        if(strstart(buffer, "place\n") == 0){
+           
+
             printf("[Client] reçoit place\n");
 
             printf("on va demander le placement au joueur %d\n", joueur);
             fflush(stdout);
             sleep(1); //TODO regler ce fix pas ouf
+            printf("Faite entrer pour commencer le placement de vos herissons:\n");
             info_placement_herisson_t * placement_herisson = demander_placement_herisson(joueur, nb_herisson_par_joueur, nb_lignes);
             
             
@@ -472,6 +478,10 @@ void* client(void* arg){
         }
 
         if(strcmp(buffer, "placed\n") == 0){
+            char* args = getarg(buffer, '\n');
+            strcpy(buffer, args);
+            free(args);
+
             printf("[Client] recoit placed:\n");
             //reçoit joueur&x1&x2&... et les place sur le plateau
             char buffer2[32];
@@ -576,6 +586,82 @@ void* client(void* arg){
     return NULL;
 }
 
+
+bool accepte_new_player(int* joueurs, int nb_joueur, int new_player){
+    for(int i = 0; i < nb_joueur; i++){
+        if(joueurs[i] == -1){
+            joueurs[i] = new_player;
+            return true;
+        }
+    }
+    return false;
+}
+
+typedef struct requete_client{
+    char* reponse;
+    int joueur;
+    int size;
+} reponse_serveur_t;
+typedef struct requete_client requete_client_t;
+
+
+void* client2(void* arg){
+    client_partie_info_t* info = (client_partie_info_t*) arg;
+    int nb_joueur = info->nb_joueur;
+    int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
+    int joueur = info->joueur;
+    char* port = info->port;
+    char* hostname = info->hostname;
+    info_partie_t* info_partie = info->info;
+
+    plateau_t * p = creer_plateau(NB_LIGNES, NB_COLONNES);
+    int nb_lignes = NB_LIGNES; //ATTENTION: si on modifie la façon de créer le plateau, il faut changer ça
+    int nb_colonnes = NB_COLONNES;
+}
+
+//cmd:[nom]\n[nb_args]\n[arg1]\n[arg2]\n...\nfin
+void* serv2(void* args){
+     printf("Serveur lancé\n");
+    server_partie_info_t* info = (server_partie_info_t*) arg;
+    int nb_joueur = info->nb_joueur;
+    int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
+    char* port = info->port;
+
+    int listenfd = -1;
+    int clientfd = -1;
+    listenfd = open_listenfd(port);
+    while(listenfd < 0){
+        printf("[SERVER] FATAL ! Erreur lors de l'ouverture du socket d'écoute, press enter to retry\n");
+        getchar();
+        listenfd = open_listenfd(port);
+        //exit(-1);
+        //return NULL;
+    }
+
+    printf("Serveur en attente de connexion\n");
+    int nb_connect = 0;
+    socklen_t clientlen;
+    struct sockaddr_storage clientaddr;
+
+    int nb_joueur_connecte = 0;
+    int* joueurs = malloc(sizeof(int) * nb_joueur);
+    for(int i = 0; i < nb_joueur; i++){
+        joueurs[i] = -1;
+    }
+    
+    //on attend les connections des joueurs
+    while(nb_joueur_connecte < nb_joueur && (clientfd = accept(listenfd, &clientaddr, &clientlen)) > 0){
+        printf("[Serveur]: Nouvelle connection\n");
+        //traitement de la connexion
+        write_log(clientfd, "who\n", 4, true);
+        char buffer[READ_SIZE];
+        int n = read(clientfd, buffer, READ_SIZE); //on demande numéro du joueur
+        int num_joueur = atoi(buffer);
+        printf("[Serveur] recoit le numero du joueur: %d\n", num_joueur);
+        joueurs[num_joueur] = clientfd;
+        nb_joueur_connecte++;
+    }
+}
 
 
 
