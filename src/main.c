@@ -322,6 +322,7 @@ info_coup_t* jouer_coup(plateau_t *p, int joueur){
                 }
             }
         }
+        free(c);
     }
 
         board_print(p);
@@ -391,6 +392,7 @@ void game_loop(plateau_t *p){
 
     board_print(p);
     printf("\n\n<<<<<<< < < <  <  Victoire de Joueur %d  >  > > > >>>>>>>\n\n",current_player);
+    free(joueurs_score);
 }
 
 
@@ -463,7 +465,7 @@ int main(){
         if (mode == 3){
             printf("Entrez l'adresse (IPV4) du serveur':\n>");
             char host [17] ;
-            scanf("%s",&host);
+            scanf("%s",host); //c'est déjà un ptr
             cinfo->hostname = host;
 
             client(cinfo);

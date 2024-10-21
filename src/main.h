@@ -15,8 +15,6 @@ char board_top (plateau_t*p, int line, int col);
 
 void board_push(plateau_t* p, int line, int col, char ctn);
 
-int jouer_coup(plateau_t *p, int joueur, int*infos_coup);
-
 char player_to_herisson(int joueur);
 //fonction pour verifier que les herissons sont bien placés
 bool is_herisson_on_case(plateau_t* p, int joueur, int ligne, int colonne);
@@ -32,5 +30,9 @@ info_coup_t* jouer_coup(plateau_t *p, int joueur);
 
 //fonction d'affichage
 void board_print(plateau_t * p);
+
+//fonction util
+char player_to_herisson(int joueur);
+int herisson_to_player(char herisson);
 
 #endif
