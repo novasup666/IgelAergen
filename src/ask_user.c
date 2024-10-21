@@ -14,11 +14,13 @@ info_placement_herisson_t * demander_placement_herisson(int joueur, int nb_heris
     for(int i = 0; i<nb_herissons; i++){
         printf("Placer le herisson %d:\n>", i);
         int c = -1;
+        fflush(stdout);
         while((c=readInt(TAILLE_MAX_ENTIER)) <0 || c >= nb_lignes){
             printf("Erreur, joueur %d, veuillez indiquer un nombre entre 0 et %d !\n", joueur, nb_lignes-1);
             printf("Placer le herisson %d:\n>", i);
         }
         info->lignes[i] = c;
+        printf("On place en %d le herisson %d du joueur %d\n", c, i, joueur);
     }
     return info;
 }
@@ -34,26 +36,26 @@ info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
     }
     printf("Nombre de joueurs: %d\n", nb_joueurs);
 
-    int nb_herrisons_par_joueurs = -1;
+    int nb_herissons_par_joueurs = -1;
     printf("Nombre d'herissons par joueurs (max 999):\n>");
-    while((nb_herrisons_par_joueurs = readInt(TAILLE_MAX_ENTIER)) <= 0){
+    while((nb_herissons_par_joueurs = readInt(TAILLE_MAX_ENTIER)) <= 0){
         printf("Erreur, veuillez indiquer un nombre positif!\n");
         printf("Nombre d'herissons par joueurs (max 999):\n>");
 
     }
-    printf("Nombre d'herissons par joueurs: %d\n", nb_herrisons_par_joueurs);
+    printf("Nombre d'herissons par joueurs: %d\n", nb_herissons_par_joueurs);
 
     //info va être un tableau 2D qui contient à la case i les positions des hérissons du joueurs i
     int **placement_herisson = calloc(nb_joueurs, sizeof(int*)); //DEBUG merci valgrind
     for(int j = 0; j<nb_joueurs; j++){
-        placement_herisson[j] = calloc(nb_herrisons_par_joueurs, sizeof(int));
+        placement_herisson[j] = calloc(nb_herissons_par_joueurs, sizeof(int));
     }
     
     for(int joueur = 0; joueur < nb_joueurs; joueur++){
         printf("=========================================================\n");
         
-            info_placement_herisson_t * info_herisson = demander_placement_herisson(joueur, nb_herrisons_par_joueurs, nb_lignes);
-            for(int herisson = 0; herisson < nb_herrisons_par_joueurs; herisson++){
+            info_placement_herisson_t * info_herisson = demander_placement_herisson(joueur, nb_herissons_par_joueurs, nb_lignes);
+            for(int herisson = 0; herisson < nb_herissons_par_joueurs; herisson++){
                 placement_herisson[joueur][herisson] = info_herisson->lignes[herisson];
             }
             free(info_herisson->lignes);
@@ -61,7 +63,7 @@ info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
         }
 
     info->nb_joueurs = nb_joueurs;
-    info->nb_herissons_par_joueurs = nb_herrisons_par_joueurs;
+    info->nb_herissons_par_joueurs = nb_herissons_par_joueurs;
     info->placement_herissons = placement_herisson;
     return info;
 }

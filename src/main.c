@@ -273,6 +273,7 @@ info_coup_t* jouer_coup(plateau_t *p, int joueur){
     info->deplacement_vertical = -1;
     info->deplacement_colonne = -1;
     info->coo_vert = NULL;
+    info->de = de;
 
 
     printf("Le joueur %d a lancé un %d et peu donc faire avancer un herisson de la ligne %d\n\n", joueur, de, de);
