@@ -126,7 +126,7 @@ void cell_print(plateau_t* p, int line, int col, int slice){
             char team2 = board_peek(p,line,col,2);
             printf(" %c%c %c%c ",lb,(team1),(team2),rb);
         }  
-        if(board_height(p,line,col) == 4){
+        if(board_height(p,line,col) >= 4){
             char team1 = board_peek(p,line,col,1);
             char team2 = board_peek(p,line,col,2);
             char team3 = board_peek(p,line,col,3);

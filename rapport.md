@@ -10,12 +10,12 @@ Igel Aergen est un jeux de plateau se jouant à plusieurs (2 à 6 joueurs normal
 
 Ce projet permet d'explorer différentes façettes et différents niveaux de la programmation C, allant du réseau à la gestion de structures abstraites. De plus, il nous aura permis d'utiliser et de nous familiariser encore un peu plus avec des outils permettant le bon développement d'un projet: la compilation automatisée avec CMake et la collaboration avec Git.
 
-## II. Première (petite) extension - Resizable Char Array
+## II. (Pas vraiment une) extension - Resizable Char Array
 ### _*Objectif*_
-Dans un souci d'économie de la mémoire et de résilience fâce à des cas extrêmes (comme des tests à 25 joueurs ayant 300 hérissons chacuns, exemple arbitraire, ne pas sous-entendre que le programme y résiste) nous avons décidé d'implémenter les petites piles qui constituent les cases à l'aide de tableaux dynamique. 
+Dans un souci d'économie de la mémoire et de résilience fâce à des cas extrêmes (comme des tests à 25 joueurs ayant 300 hérissons chacuns, exemple arbitraire, ne pas sous-entendre que le programme y résiste) nous avons décidé d'implémenter les piles qui constituent les cases à l'aide de tableaux dynamiques. 
 
 ### _*Réalisation*_
-Un module ```ResizableCharArray``` a  été créé  qui permet le type ```rca_t```. Celui-ci est utilisé pour stocker les hérissons situés sur une case. L'implémentation est classique, les tableaux sont initialisés de sorte à n'utiliser que peut de mémoire, l'espace alloué est doublé de taille à chaque dépassement de la capacité. Ceci permet d'éviter d'allouer, pour chaque case, l'espace nécessaire à stocker les hérissons dans le pire cas possible, c'est-à-dire tout les hérissons sur la même case.
+Un module ```ResizableCharArray``` a  été créé, il permet le type ```rca_t```. Celui-ci est utilisé pour stocker les hérissons situés sur une case. L'implémentation est classique, les tableaux sont initialisés de sorte à n'utiliser que peut de mémoire, l'espace alloué est doublé de taille à chaque dépassement de la capacité. Ceci permet d'éviter d'allouer, pour chaque case, l'espace nécessaire à stocker les hérissons dans le pire cas possible, c'est-à-dire tout les hérissons sur la même case.
 
 ## III. Principale extension - Mode multijoueur en réseau
 
