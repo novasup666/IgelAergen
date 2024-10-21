@@ -126,7 +126,7 @@ void cell_print(plateau_t* p, int line, int col, int slice){
             char team2 = board_peek(p,line,col,2);
             printf(" %c%c %c%c ",lb,(team1),(team2),rb);
         }  
-        if(board_height(p,line,col) >= 4){
+        if(board_height(p,line,col) == 4){
             char team1 = board_peek(p,line,col,1);
             char team2 = board_peek(p,line,col,2);
             char team3 = board_peek(p,line,col,3);
@@ -398,24 +398,23 @@ void game_loop(plateau_t *p){
 
 
 
+int _main(){
+    char * test = "salut$gate";
+    int a = lookup(test, '$');
+    printf("lookup: %d\n", a);
+    printf("valeur: %s\n", test+a);
+    return 0;
+}
 
-
-int main(int argc, char*argv){
+int main(){
     srand(time(NULL)); //initialise le générateur de nombre aléatoire, à appeler une seule fois !
     
     printf("\n\n<<<<<<< < < <  <  Bienvenue dans Igel Aergen  >  > > > >>>>>>>\n\n");
     printf("Ce programme permet de jouer à ce jeu de 3 façons différentes\n- En mode classique: tout les joueurs jouent sur la machine\n- En mode multi:\n    - un joueur est le serveur\n    - les autres sont les clients\n");
 
-    int mode;
+    printf("Entrez le mode de jeu désiré : \n 1: classique    | 2: serveur    | 3: client\n>");
 
-    if (argc == 2){
-        mode = (int) (argv[1] - '0');
-    }
-    else{
-        printf("Entrez le mode de jeu désiré : \n 1: classique    | 2: serveur    | 3: client\n>");
-        mode = readInt(2);
-    }
-
+    int mode = readInt(2);
 
     if (mode == 1){
         info_partie_t* info = demander_info_partie(NB_LIGNES, NB_COLONNES);
@@ -486,6 +485,7 @@ int main(int argc, char*argv){
     return 0;
 }
 
+/*
 int old_test_main(){
     server_partie_info_t info;
     info.nb_joueur = 1;
@@ -507,4 +507,4 @@ int old_test_main(){
     pthread_join(serv, NULL);
     //close(c);
     return 0;
-}
+}*/

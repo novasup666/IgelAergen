@@ -63,4 +63,6 @@ void* serveur_test(void* arg);
 
 int int_to_ascii(int n, char* buffer);
 
+int lookup(char* str, char delim);
+
 #endif

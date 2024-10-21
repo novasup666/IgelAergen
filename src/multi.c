@@ -16,7 +16,6 @@ Un client getaddrinfo(), il obtient un socket, il se connecte et utilise recv() 
 char* hostname = "localhost";
 FILE* log_file = NULL;
 
-<<<<<<< HEAD
 
 
 /* fonction d'exemple pour  ce familiariser avec les sockets, je le delete press enter to retr enter to retrprès TODO DELETE ! 
@@ -50,8 +49,6 @@ void* serveur_test(void* arg){
     return NULL;
 }*/
 
-=======
->>>>>>> 3ca5129 (fin multi reste du bug fix)
 int calc_size(int n){
     int size = 0;
     while(n > 0){
@@ -152,19 +149,16 @@ void * serveur(void* arg){
     for(int j = 0; j < nb_joueur; j++){
         write_log(joueurs[j], "place\n", 6, true);
         char buffer[READ_SIZE];
-        char num_joueur[READ_SIZE];
-        clear_buffer(num_joueur, READ_SIZE);
         clear_buffer(buffer, READ_SIZE);
-        int taille_num_joueur = int_to_ascii(j, num_joueur);
-        strcpy(buffer, num_joueur);
-        int n = read(joueurs[j], buffer+taille_num_joueur, READ_SIZE);
+        int n = read(joueurs[j], buffer, nb_herisson_par_joueur*2+2); //+2 car au plus 27 joueurs
+        printf("[Serveur] recoit placement de %d de valeur '%s' et de taille %d\n", j, buffer, n);
         for(int other_j = 0; other_j < nb_joueur; other_j++){
                 if(other_j == j){
                     continue;
                 }
-                printf("[Serveur] envoie placement à %d\n", other_j);
+                printf("[Serveur] envoie placement à %d de valeur '%s'\n", other_j, buffer);
                 write_log(joueurs[other_j], "placed\n", 7, true);
-                write_log(joueurs[other_j], buffer, n+taille_num_joueur, true);
+                write_log(joueurs[other_j], buffer, nb_herisson_par_joueur*2+2, true);
         }
     }
 
@@ -268,15 +262,15 @@ info_placement_herisson_t* servinfo_to_placement_herisson(char* serv, int nb_her
         char* buffer = malloc(sizeof(char)*(next+1));
         strncpy(buffer, serv+index, next);
         buffer[next] = '\0';
-        printf("buffer: %s\n\n\n", buffer);
         lignes[index_placement] = atoi(buffer);
         free(buffer);
         index += next+1;
         index_placement++;
     }
     printf("servtoco\n");
+    printf("Joueur %d avec %d herissons\n", joueur, nb_herissons);
     for(int i = 0; i < nb_herissons; i++){
-        printf("ligne %d\n", lignes[i]);
+        printf("Ligne %d: %d\n",i, lignes[i]);
     }
     res->lignes = lignes;
     return res;
@@ -370,6 +364,25 @@ info_coup_t* convertir_en_coup(char* serv){
     return res;
 }
 
+bool strstart(char* str, char* start){
+    int i = 0;
+    while(start[i] != '\0'){
+        if(str[i] != start[i]){
+            return false;
+        }
+        i++;
+    }
+    return true;
+}
+
+char* getarg(char* str, char sep){
+    int index = lookup(str, sep);
+    char* res = malloc(sizeof(char)*(index+1));
+    strncpy(res, str, index+1);
+    res[index] = '\0';
+    return res;
+}
+
 void* client(void* arg){
     client_partie_info_t* info = (client_partie_info_t*) arg;
     int nb_joueur = info->nb_joueur;
@@ -394,14 +407,18 @@ void* client(void* arg){
     }
 
     bool fini = false;
+    char buffer[64];
+    clear_buffer(buffer, 64);
+    int n = 0;
     while(!fini){
-        char buffer[64];
         clear_buffer(buffer, 64);
-        int n = read(clientfd, buffer, 64);
-
+        n = read(clientfd, buffer, 64);
+        while(1){
+        
         if(buffer == NULL){
             printf("Erreur lors de la lecture du buffer, CETTE ERREUR EST NORMALEMENT IMPOSSIBLE !\n");
-            continue;
+            break;
+            //continue;
         }
 
         if(buffer[0]=='\0' && !buffer_vide_anonce){
@@ -417,27 +434,26 @@ void* client(void* arg){
             player_number[s] = '\0';
             write_log(clientfd, player_number, s, false);
             free(player_number);
-            continue;
+            //continue;
         }
 
         if(strcmp(buffer, "all_players_ok\n") == 0){
             printf("[Client] reçoit all_players_ok\n");
             //on a tous les joueurs, on peut commencer à placer les pions
-            continue;
+            //continue;
         }   
 
         if(strcmp(buffer, "place\n") == 0){
-<<<<<<< HEAD
             printf("[Client] reçoit place\n");
-=======
-            printf("[Client] %d recoit place\n", joueur);
-            printf("ON DEMANDE AU JOUEUR %d DE PLACER SA BESTIOLE\n", joueur);
-            usleep(500*1000); //TODO regler ce fix pas ouf
->>>>>>> 3ca5129 (fin multi reste du bug fix)
+
+            printf("on va demander le placement au joueur %d\n", joueur);
+            fflush(stdout);
+            sleep(1); //TODO regler ce fix pas ouf
             info_placement_herisson_t * placement_herisson = demander_placement_herisson(joueur, nb_herisson_par_joueur, nb_lignes);
             
             
             //envoyer x1&x2&...&n pour placer les pions
+
             char * placement = placement_herisson_to_serv_infoi(placement_herisson);
             printf("On va envoyer '%s' car on a %d %d %d\n", placement, placement_herisson->joueur, placement_herisson->lignes[0], placement_herisson->lignes[1]);
 
@@ -452,7 +468,7 @@ void* client(void* arg){
             free(placement);
             
             board_print(p);
-            continue;
+            //continue;
         }
 
         if(strcmp(buffer, "placed\n") == 0){
@@ -464,7 +480,7 @@ void* client(void* arg){
             printf("[Client] placed arg: %s\n", buffer2);
             info_placement_herisson_t * placement_herisson = servinfo_to_placement_herisson(buffer2, nb_herisson_par_joueur, joueur);
 
-
+            printf("On recoit %d %d %d\n", placement_herisson->joueur, placement_herisson->lignes[0], placement_herisson->lignes[1]);
             for(int h=0; h<placement_herisson->nb_herissons; h++){
                 board_push(p, placement_herisson->lignes[h], 0, player_to_herisson(placement_herisson->joueur));
             }
@@ -472,7 +488,7 @@ void* client(void* arg){
             free(placement_herisson->lignes);
             free(placement_herisson);
 
-            continue;
+            //continue;
         }
 
 
@@ -493,7 +509,7 @@ void* client(void* arg){
             char* coup = formatter_coup(info);
             write(clientfd, coup, strlen(coup));
             free(coup);
-            continue;
+            //continue;
         }
 
         if(strcmp(buffer, "move\n") == 0){
@@ -526,7 +542,7 @@ void* client(void* arg){
             free(coup->coo_vert);
             free(coup);
 
-            continue;
+            //continue;
         }
 
         if(strcmp(buffer, "win\n") == 0){
@@ -536,14 +552,20 @@ void* client(void* arg){
             break;
         }
 
-        printf("[Client] recoit '%s' qui sera ignoré \n", buffer);
-        printf("Buffer 0: '%c'\n", buffer[0]);
-       /* char** res = cut(buffer, '\n');
-        free(res[0]);
-        strcpy(buffer, res[1]);
-        free(res[1]);
-        free(res);*/
+        printf("[Client] recoit une commande non reconnu: '%s' \n", buffer);
 
+
+        //on essaye de voir si on a pas reçu plusieurs commandes en même temps:
+        int index = lookup(buffer, '\n');
+        if(index == -1){
+            printf("Erreur, buffer non reconnu: %s\n", buffer);
+            break;
+        }
+        strncpy(buffer, buffer+index+1, 64-index);
+        printf("nouveau buffer: %s\n", buffer);
+
+        }
+    //on relit une nouvelle commande
     }
 
 
