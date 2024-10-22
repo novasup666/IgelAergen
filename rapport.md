@@ -41,7 +41,9 @@ Ainsi cette extension fait intervenir 2 composantes imprévues pour le projet: l
 
 1. Phase d'initialisation:
     - Le serveur envoie à chaque client connecté la requête `who`
-
+    - Ceux-ci lui répondent en indiquant leurs numéro de joueur
+    - Une fois que le nombre attendu de joueurs s'est connecté, le serveur envoie `all_player_ok` à chacun des joueurs 
+    - Ceux-ci répondent avec le placement de leurs herissons.
 
 ## IV. Bibliographie
 

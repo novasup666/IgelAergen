@@ -46,8 +46,8 @@ plateau_t* creer_plateau(int nb_lignes, int nb_colonnes){
     return p;
 }
 
-int lancer_de(){
-    return rand()%6 ;
+int lancer_de(void){
+    return rand()%NB_LIGNES ;
 }
 
 
@@ -438,7 +438,7 @@ int _main(int argc, char** argv){
 
     printf("Entrez le mode de jeu désiré : \n 1: classique    | 2: serveur    | 3: client\n>");
     int mode;
-    if (argc == 2){
+    if (argc == 3){
         mode = atoi(argv[1]);
     }
     else{

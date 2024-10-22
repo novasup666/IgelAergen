@@ -11,6 +11,8 @@
 #define NB_LIGNES 6
 #define NB_COLONNES 9
 
+int lancer_de(void);
+
 char board_top (plateau_t*p, int line, int col);
 char board_pop(plateau_t* p, int line, int col);
 void board_push(plateau_t* p, int line, int col, char ctn);
