@@ -26,16 +26,21 @@ Afin de permettre un mode multi-joueur plus confortable, pour les joueurs, nous 
 
 
 ### *_Réalisation_*
-Pour ce faire, une architecture client-serveur à été choisie. 
+Pour ce faire, une architecture client-serveur à été choisie. L'essentiel du code soutenant cette architecture se situe dans le module ```multi```, créé par nos soins.
 
-Le client execute la fonction ```client()``` de ```multi.c```, celle-ci prends comme argument une structure portant diverses informations de connection et paramêtres de la partie.
+Le client execute la fonction ```client()```, celle-ci prends comme argument une structure portant diverses informations de connection et paramêtres de la partie.
 
 Le serveur, lui, à un rôle un peu plus complexe. En effet, le serveur est aussi joueur, il executera donc en parallèle : 
-- la fonction ```serveur()``` (aussi située dans ```multi.c```) permettant d'orchestrer les différentes phases du jeux et la synchronisation des plateaux entre les joueurs.
+- la fonction ```serveur()``` permettant d'orchestrer les différentes phases du jeux et la synchronisation des plateaux entre les joueurs.
 - la fonction ```client()``` connectée au serveur hébergé sur la même machine, permettant au propriétaire de la machine de jouer aussi.
 
 La communication entre clients et serveur se fait au travers de sockets réseau, à l'aide du module ```csapp.h```.
 Ainsi cette extension fait intervenir 2 composantes imprévues pour le projet: le gestion de sockets et le multithreading.
+
+### _*Protocole de communication*_
+
+1. Phase d'initialisation:
+    - Le serveur envoie à chaque client connecté la requête `who`
 
 
 ## IV. Bibliographie

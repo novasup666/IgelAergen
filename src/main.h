@@ -8,8 +8,8 @@
 #include "multi.h"
 
 
-#define NB_LIGNES 3
-#define NB_COLONNES 4
+#define NB_LIGNES 6
+#define NB_COLONNES 9
 
 char board_top (plateau_t*p, int line, int col);
 char board_pop(plateau_t* p, int line, int col);

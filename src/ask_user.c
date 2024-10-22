@@ -29,7 +29,7 @@ info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
     
     int nb_joueurs = -1;
     printf("Nombre de joueurs (max 27):\n>");
-    while((nb_joueurs = readInt(2)) <= 0 || nb_joueurs > 27){ //ici on utilise 2 car on veut un nombre entre 0 et 27
+    while((nb_joueurs = readInt(3)) <= 0 || nb_joueurs > 27){ //ici on utilise 2 car on veut un nombre entre 0 et 27
         printf("Erreur, veuillez indiquer un nombre entre 1 et 27!\n");
         printf("Nombre de joueurs (max 27):\n>");
     }

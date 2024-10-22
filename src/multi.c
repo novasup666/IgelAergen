@@ -782,8 +782,7 @@ void* client2(void* arg){
     plateau_t * p = creer_plateau(NB_LIGNES, NB_COLONNES);
     int nb_lignes = NB_LIGNES; //ATTENTION: si on modifie la façon de créer le plateau, il faut changer ça
     int nb_colonnes = NB_COLONNES;
-
-        int clientfd = open_clientfd(hostname, port);
+    int clientfd = open_clientfd(hostname, port);
 
     while(clientfd < 0){
         printf("Erreur lors de la connexion au serveur, press enter key to retry\n");
@@ -824,7 +823,7 @@ void* client2(void* arg){
 
 //cmd:[nom]id:[-1 pour server/num_joueur]\n[nb_args]\n[arg1]\n[arg2]\n...\nfin
 void* serv2(void* arg){
-     printf("Serveur lancé\n");
+    printf("Serveur lancé\n");
     server_partie_info_t* info = (server_partie_info_t*) arg;
     int nb_joueur = info->nb_joueur;
     int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
@@ -848,7 +847,8 @@ void* serv2(void* arg){
 
     int nb_joueur_connecte = 0;
     int* joueurs = malloc(sizeof(int) * nb_joueur);
-    for(int i = 0; i < nb_joueur; i++){
+    for(int i = 0; i < nb_joueur; i++){broadcast ```"who"```.
+    - Les clients répondent avec leurs numéro de joueurs sous la fo
         joueurs[i] = -1;
     }
     
