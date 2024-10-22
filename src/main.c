@@ -430,15 +430,14 @@ int __main(){
     return 0;
 }
 
-int _main(int argc, char** argv){
+int main(int argc, char** argv){
     srand(time(NULL)); //initialise le générateur de nombre aléatoire, à appeler une seule fois !
     
     printf("\n\n<<<<<<< < < <  <  Bienvenue dans Igel Aergen  >  > > > >>>>>>>\n\n");
     printf("Ce programme permet de jouer à ce jeu de 3 façons différentes\n- En mode classique: tout les joueurs jouent sur la machine\n- En mode multi:\n    - un joueur est le serveur\n    - les autres sont les clients\n");
 
-    printf("Entrez le mode de jeu désiré : \n 1: classique    | 2: serveur    | 3: client\n>");
     int mode;
-    if (argc == 3){
+    if (argc == 2){
         mode = atoi(argv[1]);
     }
     else{
@@ -447,6 +446,7 @@ int _main(int argc, char** argv){
     }
 
     if (mode == 1){
+        printf("Vous avez choisi le mode classique !\n");
         info_partie_t* info = demander_info_partie(NB_LIGNES, NB_COLONNES);
         plateau_t* p = initialiser_partie(NB_LIGNES, NB_COLONNES, info);
         printf("\n\n<<<<<<< < < <  <  Plateau initialisé !  >  > > > >>>>>>>\n\n");
@@ -526,7 +526,7 @@ int main_test(){
     client2(&info_client);
 }
 
-int main(int argc, char** argv){
+int _main(int argc, char** argv){
     int local = atoi(argv[1]);
     if(local){
         return main_test();
