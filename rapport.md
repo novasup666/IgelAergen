@@ -13,12 +13,12 @@ Ce projet permet d'explorer différentes façettes et différents niveaux de la 
 
 ## II. (Pas vraiment une) extension - Resizable Char Array
 ### _*Objectif*_
-Dans un souci d'économie de la mémoire, nous avons décidé d'implémenter les piles qui constituent les cases à l'aide de tableaux dynamiques. 
+Dans un souci d'économie de la mémoire, nous avons décidé d'implémenter les piles qui constituent les cases du plateau à l'aide de tableaux dynamiques. 
 Ceci permet d'éviter d'allouer, pour chaque case, l'espace nécessaire à stocker les hérissons dans le pire cas possible, c'est-à-dire tout les hérissons sur la même case.
 
-Cette extension n'en est pas vraiment une car elle ne peut être désactivée, c'est plutôt un choix d'implémentation que nous avons considéré comme suffisament influent pour mériter sa place dans le rapport.
+Cette extension n'en est pas vraiment une car elle ne peut pas être désactivée, c'est plutôt un choix d'implémentation que nous avons considéré comme suffisament influent pour mériter sa place dans le rapport.
 ### _*Réalisation*_
-Un module ```ResizableCharArray``` a  été créé, il permet le type ```rca_t```. Celui-ci est utilisé pour stocker les hérissons situés sur une case. L'implémentation est classique, les tableaux sont initialisés de sorte à n'utiliser que peut de mémoire, l'espace alloué est doublé de taille à chaque dépassement de la capacité. 
+Un module ```ResizableCharArray``` a  été créé, il permet le type ```rca_t```. Celui-ci est utilisé pour stocker les hérissons situés sur une case. L'implémentation est classique, les tableaux sont initialisés de sorte à n'utiliser que peu de mémoire, l'espace alloué est doublé de taille à chaque dépassement de la capacité. 
 
 ## III. (Une toute petite) extension - Choix des positions de départ
 
@@ -26,7 +26,7 @@ Un module ```ResizableCharArray``` a  été créé, il permet le type ```rca_t``
 
 ### *_Objectif_*
 
-Cette extension vient initialement d'une erreur dans la compréhension du sujet. Nous avons finalement décidé de conserver cette fonctionnalité, le joueur a donc le choix de placer ses pions à la main ou de manière aléatoire (en fonctionde la valeur de `PLACEMENT_RANDOM` dans `main.h`).
+Cette extension vient initialement d'une erreur dans la compréhension du sujet. Nous avons finalement décidé de conserver cette fonctionnalité, le joueur a donc le choix de placer ses pions à la main ou de manière aléatoire (en fonction de la valeur de `PLACEMENT_RANDOM` dans `main.h`).
 
 ### *_Réalisation_*
 
@@ -44,18 +44,18 @@ Afin de permettre un mode multi-joueur plus confortable, pour les joueurs, nous 
 
 ### *_Réalisation_*
 Pour ce faire, une architecture client-serveur à été choisie. L'essentiel du code soutenant cette architecture se situe dans le module ```multi```, créé par nos soins.
-Notons que chaque machine stocke sa propre instance du plateau, celle-ci évolue avec les coups jouée par chaque joueur.
+Notons que chaque machine stocke sa propre instance du plateau, celle-ci évolue avec les coups joués par chaque joueur.
 Le serveur cherche donc à synchroniser les différents plateaux des différents clients.
 
 
-Le client execute la fonction ```client()```, celle-ci prends comme argument une structure portant diverses informations de connection et paramêtres de la partie.
+Le client éxecute la fonction ```client()```, celle-ci prends comme argument une structure portant diverses informations de connection et paramêtres de la partie.
 
-Le serveur, lui, à un rôle un peu plus complexe. En effet, le serveur est aussi joueur, il executera donc en parallèle : 
+Le serveur, lui, a un rôle un peu plus complexe. En effet, le serveur est aussi joueur, il executera donc en parallèle : 
 - la fonction ```serveur()``` permettant d'orchestrer les différentes phases du jeux et la synchronisation des plateaux entre les joueurs.
 - la fonction ```client()``` connectée au serveur hébergé sur la même machine, permettant au propriétaire de la machine de jouer aussi.
 
 La communication entre clients et serveur se fait au travers de sockets réseau, à l'aide du module ```csapp.h```.
-Ainsi cette extension fait intervenir 2 composantes imprévues pour le projet: le gestion de sockets et le multithreading.
+Ainsi cette extension fait intervenir 2 composantes extérieures au projet initial: le gestion de sockets et le multithreading.
 
 ### _*Protocole de communication*_
 
@@ -107,7 +107,11 @@ Le joueur 0 place des hérissons aux lignes 0, 4 et 5.
 
 ## V. Synthèse
 
-Observons tout d'abord que tout les modes de jeux fonctionnent (c'est déjà une victoire !) cependant, certaines observations sont nécessaires.
+Remarquons d'abord qu'une segfault repérée bien tard (18h52) empêche le mode multijoueur avec les hérissons placés au hasard de fonctionner.
+
+Cette segfault est surement due à la gestion des différents mode de placement des hérissons.
+
+Au delà de ça, certaines observations sont nécessaires.
 
 Remarquons le bilan mitigé de l'extension permettant le choix des positions de départ des hérissons. En effet, celle-ci ajoute une lourdeur considérable au jeu sans apporter un grand avantage ludique.
 
@@ -115,12 +119,12 @@ Remarquons le bilan mitigé de l'extension permettant le choix des positions de 
 Aussi, le choix aléatoire des positions initiales des hérissons semble être d'assez mauvaise facture. 
 
 En effet, dans le mode classique, les hérissons, bien que placés sur des lignes au hasard, le sont dans un ordre prédéterminé (1er herisson du joueur 0, 1er herisson du joueur 1, etc...), ainsi le dernier hérisson du dernier joueur se trouvera toujours en haut de sa pile. 
-Ainsi, ce mode de placement des hérissons ne suit pas tout à fait la demande d'aléatoire. La solution aurait été de tirer au hasard une permutation des joueurs afin que le $i^{eme}$ empilement (celui du $i^{eme}$ herisson de chaque joueur) se fasse dans un ordre aléatoire, mais cela n'a pas été implémenté.
+Ainsi, ce mode de placement des hérissons ne suit pas tout à fait la demande d'aléatoire. La solution aurait été de tirer au hasard une permutation des hérissons, mais cela n'a pas été implémenté.
 
 
-Cependant, il y a pire, dans le mode multijoueur, bien que les lignes sur lesquelles les hérissons sont placés soient tirées au hasard, l'ordre dans lequel ces herissons sont empilés sur les cases correspond à l'ordre croissant des identifiant des joueurs. 
-Ainsi, le dernier joueur trouvera toujours ses hérissons au dessus de ceux des autres (tout les hérissons du joueur 0, tout ceux du joueur 1, etc..). 
-Une implémentation centralisée, utilisant des permutations tirées au hasard, aurait été préférable mais n'a pas été mise en place.
+Cependant, il y a pire, dans le mode multijoueur, bien que les lignes sur lesquelles les hérissons sont placés soient tirées au hasard, l'ordre dans lequel ces herissons sont empilés sur les cases correspond à l'ordre croissant des identifiant des joueurs (tout les hérissons du joueur 0, tout ceux du joueur 1, etc..). 
+Ainsi, le dernier joueur trouvera toujours ses hérissons au dessus de ceux des autres. 
+Une implémentation centralisée, utilisant une permutation tirée au hasard, aurait été préférable mais n'a pas été mise en place.
 
 De plus l'extension permettant le mode multijoueur en réseau est assez instable (à cause de problêmes de concurrence et de lecture de buffers).
 

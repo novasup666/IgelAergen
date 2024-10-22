@@ -107,7 +107,6 @@ int demander_coo_plateau(int joueur, int max, bool is_ligne, bool mandatory){
     return r;
 }
 
-//TODO
 
 
 

@@ -23,6 +23,9 @@ void flush_stdin(){
 
 //renvoie la valeur si c'est correcte, -1 si NaN -2 si il y a un depassement de capacité et -3  si EOF
 int _readInt(int size){
+
+    // Philosophiquement plus intéressante mais finalement pas utilisée
+
     fflush(stdout);
     char* buffer = calloc(size+1, sizeof(char));
     int n = 0;
