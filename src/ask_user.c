@@ -54,7 +54,7 @@ info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
 
     
     if (PLACEMENT_ALEATOIRE){
-        for (int herisson = 0; herisson < nb_herisson_par_joueur; herisson++){
+        for (int herisson = 0; herisson < nb_herissons_par_joueurs; herisson++){
             for (int joueur = 0; joueur <nb_joueurs; joueur ++){
                 placement_herisson[joueur][herisson] = lancer_de();
             }
