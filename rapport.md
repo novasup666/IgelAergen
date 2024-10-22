@@ -107,9 +107,20 @@ Le joueur 0 place des hérissons aux lignes 0, 4 et 5.
 
 ## V. Synthèse
 
-Remarquons tout d'abord que tout les modes de jeux fonctionnent comme prévu cependant, certains observations sont nécessaires.
+Observons tout d'abord que tout les modes de jeux fonctionnent (c'est déjà une victoire !) cependant, certaines observations sont nécessaires.
 
-Remarquons tout d'abord le bilan mitigé de l'extension permettant le choix des positions de départ des hérissons. En effet, celle-ci ajoute une lourdeur considérable au jeu sans apporter un grand avantage ludique.
+Remarquons le bilan mitigé de l'extension permettant le choix des positions de départ des hérissons. En effet, celle-ci ajoute une lourdeur considérable au jeu sans apporter un grand avantage ludique.
+
+
+Aussi, le choix aléatoire des positions initiales des hérissons semble être d'assez mauvaise facture. 
+
+En effet, dans le mode classique, les hérissons, bien que placés sur des lignes au hasard, le sont dans un ordre prédéterminé (1er herisson du joueur 0, 1er herisson du joueur 1, etc...), ainsi le dernier hérisson du dernier joueur se trouvera toujours en haut de sa pile. 
+Ainsi, ce mode de placement des hérissons ne suit pas tout à fait la demande d'aléatoire. La solution aurait été de tirer au hasard une permutation des joueurs afin que le $i^{eme}$ empilement (celui du $i^{eme}$ herisson de chaque joueur) se fasse dans un ordre aléatoire, mais cela n'a pas été implémenté.
+
+
+Cependant, il y a pire, dans le mode multijoueur, bien que les lignes sur lesquelles les hérissons sont placés soient tirées au hasard, l'ordre dans lequel ces herissons sont empilés sur les cases correspond à l'ordre croissant des identifiant des joueurs. 
+Ainsi, le dernier joueur trouvera toujours ses hérissons au dessus de ceux des autres (tout les hérissons du joueur 0, tout ceux du joueur 1, etc..). 
+Une implémentation centralisée, utilisant des permutations tirées au hasard, aurait été préférable mais n'a pas été mise en place.
 
 De plus l'extension permettant le mode multijoueur en réseau créé un certain nombre de fuites de mémoire dû à l'hétérogénéité des modes d'instanciation des commandes. Une procédure unique et standardisée aurait été préférable mais elle n'a pas été implémentée.
 
