@@ -430,7 +430,7 @@ int __main(){
     return 0;
 }
 
-int main(int argc, char** argv){
+int _main(int argc, char** argv){
     srand(time(NULL)); //initialise le générateur de nombre aléatoire, à appeler une seule fois !
     
     printf("\n\n<<<<<<< < < <  <  Bienvenue dans Igel Aergen  >  > > > >>>>>>>\n\n");
@@ -518,26 +518,26 @@ int main(int argc, char** argv){
 
 int main_test(){
     client_partie_info_t info_client;
-    info_client.nb_joueur = 1;
+    info_client.nb_joueur = 2;
     info_client.nb_herisson_par_joueur = 1;
-    info_client.joueur = 0;
+    info_client.joueur = 1;
     info_client.port = "8080";
     info_client.hostname = "localhost";
     client2(&info_client);
 }
 
-int _main(int argc, char** argv){
+int main(int argc, char** argv){
     int local = atoi(argv[1]);
     if(local){
         return main_test();
     }
     server_partie_info_t info;
-    info.nb_joueur = 1;
+    info.nb_joueur = 2;
     info.nb_herisson_par_joueur = 1;
     info.port = "8080";
 
     client_partie_info_t info_client;
-    info_client.nb_joueur = 1;
+    info_client.nb_joueur = 2;
     info_client.nb_herisson_par_joueur = 1;
     info_client.joueur = 0;
     info_client.port = "8080";
