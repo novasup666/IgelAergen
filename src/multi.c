@@ -16,42 +16,6 @@ Un client getaddrinfo(), il obtient un socket, il se connecte et utilise recv() 
 char* hostname = "localhost";
 FILE* log_file = NULL;
 
-<<<<<<< HEAD
-
-
-/* fonction d'exemple pour  ce familiariser avec les sockets, je le delete press enter to retr enter to retrprès TODO DELETE ! 
-void* serveur_test(void* arg){
-    printf("Serveur lancé\n");
-    int listenfd = -1;
-    int clientfd = -1;
-    listenfd = open_listenfd("8080");
-    if(listenfd < 0){
-        printf("Erreur lors de l'ouverture du socket d'écoute\n");
-        return NULL;
-    }
-    printf("Serveur en attente de connexion\n");
-    int nb_connect = 0;
-    socklen_t clientlen;
-    struct sockaddr_storage clientaddr;
-    while((clientfd = accept(listenfd, &clientaddr, &clientlen)) > 0){
-        printf("Connexion établie\n");
-        //traitement de la connexion
-        write(clientfd, "Hello", 5);
-        char buffer[1024];
-        int n = read(clientfd, buffer, 1024);
-        printf("Serveur lit: %s\n", buffer);
-        if(strcmp(buffer, "STOP") == 0){
-            printf("Serveur reçoit STOP\n");
-            break;
-        }
-        close(clientfd);
-    }
-    close(listenfd);
-    return NULL;
-}*/
-
-=======
->>>>>>> 3ca5129 (fin multi reste du bug fix)
 int calc_size(int n){
     int size = 0;
     while(n > 0){
@@ -427,13 +391,9 @@ void* client(void* arg){
         }   
 
         if(strcmp(buffer, "place\n") == 0){
-<<<<<<< HEAD
-            printf("[Client] reçoit place\n");
-=======
             printf("[Client] %d recoit place\n", joueur);
             printf("ON DEMANDE AU JOUEUR %d DE PLACER SA BESTIOLE\n", joueur);
             usleep(500*1000); //TODO regler ce fix pas ouf
->>>>>>> 3ca5129 (fin multi reste du bug fix)
             info_placement_herisson_t * placement_herisson = demander_placement_herisson(joueur, nb_herisson_par_joueur, nb_lignes);
             
             
