@@ -37,7 +37,7 @@ struct info_partie_s{
 typedef struct info_partie_s info_partie_t;
 
 struct info_coup{
-    int result;
+    int result; //-2 si gagné 
     int joueur;
     int de; //valeur du dès, ligne du herisson à déplacer
     int deplacement_vertical; //0 si non, 1 si haut, 2 si bas

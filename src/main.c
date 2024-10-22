@@ -366,6 +366,9 @@ info_coup_t* jouer_coup(plateau_t *p, int joueur){
             choix_horizontal_valide = true;
         }
     }
+
+
+    printf("PUTIN DE COUILLASE DE CONNARD DE MERDE %d\n", info->result);
     
     return info;
 }
