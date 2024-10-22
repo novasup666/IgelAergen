@@ -398,15 +398,29 @@ void game_loop(plateau_t *p){
 
 
 
-int _main(){
-    char * test = "salut$gate";
-    int a = lookup(test, '$');
-    printf("lookup: %d\n", a);
-    printf("valeur: %s\n", test+a);
+int __main(){
+    commande_t* c = str_to_cmd("cmd:who\nid:0\n0\nfin");
+    if(c == NULL){
+        printf("Erreur\n");
+        return 1;
+    }
+    printf("cmd: '%s'\n", c->cmd);
+    printf("id: %d\n", c->id);
+    printf("nb_args: %d\n", c->nb_args);
+    for(int i = 0; i < c->nb_args; i++){
+        printf("arg %d: %s\n", i, c->args[i]);
+    }
+
+    char* str = cmd_to_str(c);
+    printf("str: %s\n", str);
+    free(str);
+
+    free_cmd(c);
+
     return 0;
 }
 
-int main(){
+int _main(){
     srand(time(NULL)); //initialise le générateur de nombre aléatoire, à appeler une seule fois !
     
     printf("\n\n<<<<<<< < < <  <  Bienvenue dans Igel Aergen  >  > > > >>>>>>>\n\n");
@@ -485,8 +499,22 @@ int main(){
     return 0;
 }
 
-/*
-int old_test_main(){
+
+int main_test(){
+    client_partie_info_t info_client;
+    info_client.nb_joueur = 1;
+    info_client.nb_herisson_par_joueur = 1;
+    info_client.joueur = 0;
+    info_client.port = "8080";
+    info_client.hostname = "localhost";
+    client2(&info_client);
+}
+
+int main(int argc, char** argv){
+    int local = atoi(argv[1]);
+    if(local){
+        return main_test();
+    }
     server_partie_info_t info;
     info.nb_joueur = 1;
     info.nb_herisson_par_joueur = 1;
@@ -501,10 +529,10 @@ int old_test_main(){
 
     pthread_t c, serv;
     printf("On lance le thread serveur: \n");
-    pthread_create(&serv, NULL, serveur, &info);
+    pthread_create(&serv, NULL, serv2, &info);
     printf("On lance le thread client: \n");
-    client(&info_client);
+    client2(&info_client);
     pthread_join(serv, NULL);
     //close(c);
     return 0;
-}*/
+}

@@ -9,6 +9,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <netdb.h>
+#include <stdarg.h>
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,10 +55,21 @@ struct client_partie_info {
 };
 typedef struct client_partie_info client_partie_info_t;
 
-
+struct commande{
+    bool is_cmd; //utile pour handle_cmd càd savoir si le client doit envoyer une réponse. Si c'est false, on assume que tout est NULL ou -1
+    int id;
+    int nb_args;
+    bool auto_instancie;
+    char* cmd;
+    char** args;
+};
+typedef struct commande commande_t;
 
 void * serveur(void* arg);
 void * client(void* arg);
+
+void* serv2(void* arg);
+void* client2(void* arg);
 
 
 void* serveur_test(void* arg);
@@ -64,5 +77,9 @@ void* serveur_test(void* arg);
 int int_to_ascii(int n, char* buffer);
 
 int lookup(char* str, char delim);
+
+commande_t* str_to_cmd(char* buffer);
+char* cmd_to_str(commande_t *cmd);
+void free_cmd(commande_t* cmd);
 
 #endif

@@ -597,13 +597,212 @@ bool accepte_new_player(int* joueurs, int nb_joueur, int new_player){
     return false;
 }
 
-typedef struct requete_client{
-    char* reponse;
-    int joueur;
-    int size;
-} reponse_serveur_t;
-typedef struct requete_client requete_client_t;
 
+
+
+commande_t* str_to_cmd(char* buffer){
+    //on lit la commande de la forme cmd:[nom]\nid:[-1 pour server/num_joueur]\n[nb_args]\n[arg1]\n[arg2]\n...\nfin
+    commande_t* res = malloc(sizeof(commande_t));
+    int index = 0;
+    if(buffer[index] != 'c' || buffer[index+1] != 'm' || buffer[index+2] != 'd' || buffer[index+3] != ':'){
+        printf("Erreur, commande mal formée:\n");
+        printf("buffer: %s\n", buffer);
+        printf("========\n");
+        return NULL;
+    }
+    index += 4;
+    int name_size = lookup(buffer+index, '\n');
+    char* name = malloc(sizeof(char)*(name_size+1));
+    strncpy(name, buffer+index, name_size);
+    name[name_size] = '\0';
+    res->cmd = name;
+
+
+    index += name_size+1;
+    if(buffer[index] != 'i' || buffer[index+1] != 'd' || buffer[index+2] != ':'){
+        printf("Erreur, id mal formé\n");
+        return NULL;
+    }
+    index += 3;
+    int id_size = lookup(buffer+index, '\n');
+    char* id = malloc(sizeof(char)*(id_size+1));
+    strncpy(id, buffer+index, id_size);
+    id[id_size] = '\0';
+    res->id = atoi(id);
+    free(id);
+
+    index += id_size;
+    if(buffer[index] != '\n'){
+        printf("Erreur, nb_args mal formé\n");
+        return NULL;
+    }
+    index++;
+    int nb_args_size = lookup(buffer+index, '\n');
+    char* nb_args = malloc(sizeof(char)*(nb_args_size+1));
+    strncpy(nb_args, buffer+index, nb_args_size);
+    nb_args[nb_args_size] = '\0';
+    res->nb_args = atoi(nb_args);
+    free(nb_args);
+
+    index += nb_args_size+1;
+    res->args = malloc(sizeof(char*)*res->nb_args);
+    for(int i = 0; i < res->nb_args; i++){
+        int arg_size = lookup(buffer+index, '\n');
+        char* arg = malloc(sizeof(char)*(arg_size+1));
+        strncpy(arg, buffer+index, arg_size);
+        arg[arg_size] = '\0';
+        res->args[i] = arg;
+        index += arg_size+1;
+    }
+
+    res->is_cmd = true;
+    res->auto_instancie = false;
+    return res;
+}
+
+//TODO regler le pb des commande auto instancié qui ne sont pas free
+//Pour l'instant on ignore la memleak
+void free_cmd(commande_t* cmd){
+    if(!cmd->auto_instancie){
+        free(cmd->cmd);
+        for(int i = 0; i < cmd->nb_args; i++){
+        free(cmd->args[i]);
+        }
+    }
+    free(cmd->args);
+    free(cmd);
+}
+
+char* cmd_to_str(commande_t *cmd){
+    char* res = calloc(128, sizeof(char));
+    int index = 0;
+    strcpy(res, "cmd:");
+    index += 4;
+    strcpy(res+index, cmd->cmd);
+    int taille_cmd = strlen(cmd->cmd);
+    strcpy(res+index+taille_cmd, "\n");
+    index += taille_cmd+1;
+    strcpy(res+index, "id:");
+    index += 3;
+    int signe = 1;
+
+
+    if(cmd->id == -1){
+        strcpy(res+index, "-1");
+        index += 2;
+    }else{
+        //l'id est positif
+        char idbuff[32];
+        int taille_id = int_to_ascii(cmd->id, idbuff);
+        strcpy(res+index, idbuff);
+        index += taille_id;
+    }
+    strcpy(res+index, "\n");
+    index++;
+
+    char numerical_buff[32];
+    clear_buffer(numerical_buff, 32);
+    int nb_arg_size = int_to_ascii(cmd->nb_args, numerical_buff);
+    strcpy(res+index, numerical_buff);
+    index += nb_arg_size;
+    strcpy(res+index, "\n");
+    index++;
+
+    for(int i = 0; i < cmd->nb_args; i++){
+        strcpy(res+index, cmd->args[i]);
+        index += strlen(cmd->args[i]);
+        strcpy(res+index, "\n");
+        index++;
+    }
+    strcpy(res+index, "fin\0");
+    return res;
+}
+
+
+commande_t* answer_who(plateau_t*p, int player, commande_t *c){
+    commande_t* res = malloc(sizeof(commande_t));
+    res->cmd = "im";
+    res->id = player;
+    res->nb_args = 0;
+    res->args = NULL;
+    res->is_cmd = true;
+    return res;
+}
+
+
+
+//source pour l'utilisation de vargs https://medium.com/swlh/variadic-function-in-c-programming-d3632315a48e
+//permet de transformer des arguments en commande_t
+commande_t* send_cmd(char* cmd, int id, bool is_cmd, int nb_args, ...){
+    va_list pargs;
+    va_start(pargs, nb_args);
+    commande_t* res = malloc(sizeof(commande_t));
+    res->cmd = cmd;
+    res->nb_args = nb_args;
+    res->args = malloc(sizeof(char*)*nb_args);
+    for(int i = 0; i < nb_args; i++){
+        res->args[i] = va_arg(pargs, char*);
+    }
+    va_end(pargs);
+    res->id = id;
+    res->is_cmd = is_cmd;
+    res->auto_instancie = true;
+    return res;
+
+}
+
+
+//utiliser par le serveur pour traiter les commandes
+commande_t* handle_cmd(plateau_t *p, int player, commande_t* cmd ){
+    if(cmd == NULL){
+        printf("Handle commande NULL\n");
+        return NULL;
+    }
+    printf("Le joueur %d recoit la commande %s\n", player, cmd->cmd);
+    //TODO utiliser une hashtbl et des pointeurs de fonctions pour éviter les if
+    if(strcmp(cmd->cmd, "who") == 0){
+        printf("On recoit who\n");
+        return send_cmd("im", player, true, 0);
+    }
+    if(strcmp(cmd->cmd, "all_players_ok") == 0){
+        printf("On recoit all_players_ok\n");
+        //on va demander le placement des herissons
+        int nb_herisson_par_joueur = atoi(cmd->args[0]);
+        int nb_lignes = atoi(cmd->args[1]);
+        info_placement_herisson_t * placement_herisson = demander_placement_herisson(player, nb_herisson_par_joueur, nb_lignes);
+        commande_t* res = malloc(sizeof(commande_t));
+        res->cmd = "place";
+        res->id = player;
+        res->nb_args = nb_herisson_par_joueur;
+        res->args = malloc(sizeof(char*)*nb_herisson_par_joueur);
+        for(int i = 0; i < nb_herisson_par_joueur; i++){
+            res->args[i] = malloc(sizeof(char)*3);
+            sprintf(res->args[i], "%d", placement_herisson->lignes[i]);
+        }
+        res->is_cmd = true;
+        return res;
+    }
+
+    printf("Commande non reconnue: '%s'\n", cmd->cmd); 
+
+    return NULL;
+
+    
+
+}
+
+void afficher_cmd(commande_t* cmd){
+    if(cmd == NULL){
+        printf("Commande NULL\n");
+        return;
+    }
+    printf("Commande: %s\n", cmd->cmd);
+    printf("Id: %d\n", cmd->id);
+    printf("Nb args: %d\n", cmd->nb_args);
+    for(int i = 0; i < cmd->nb_args; i++){
+        printf("Arg %d: %s\n", i, cmd->args[i]);
+    }
+}
 
 void* client2(void* arg){
     client_partie_info_t* info = (client_partie_info_t*) arg;
@@ -617,10 +816,48 @@ void* client2(void* arg){
     plateau_t * p = creer_plateau(NB_LIGNES, NB_COLONNES);
     int nb_lignes = NB_LIGNES; //ATTENTION: si on modifie la façon de créer le plateau, il faut changer ça
     int nb_colonnes = NB_COLONNES;
+
+        int clientfd = open_clientfd(hostname, port);
+
+    while(clientfd < 0){
+        printf("Erreur lors de la connexion au serveur, press enter key to retry\n");
+        int c = getchar();
+        clientfd = open_clientfd(hostname, port);
+    }
+    char buffer[READ_SIZE];
+    clear_buffer(buffer, READ_SIZE);
+
+    int n = 0;
+    bool fini = false;
+    while(!fini){
+        int n = read(clientfd, buffer, READ_SIZE);
+        commande_t* cmd = str_to_cmd(buffer);
+        printf("Client recoit commande:\n");
+        afficher_cmd(cmd);
+        commande_t* res = handle_cmd(p, joueur, cmd);
+        printf("Client envoie commande:\n");
+        afficher_cmd(res);
+        fflush(stdout);
+        if(res != NULL & res->is_cmd){
+            char* str = cmd_to_str(res);
+            write(clientfd, str, strlen(str));
+            free(str);
+        }
+
+        //free_cmd(cmd);
+        if(res != NULL){
+            free_cmd(res);
+        }
+
+        printf("FIN DE LA BOUCLE\n");
+
+    }
+    return NULL;
+
 }
 
-//cmd:[nom]\n[nb_args]\n[arg1]\n[arg2]\n...\nfin
-void* serv2(void* args){
+//cmd:[nom]id:[-1 pour server/num_joueur]\n[nb_args]\n[arg1]\n[arg2]\n...\nfin
+void* serv2(void* arg){
      printf("Serveur lancé\n");
     server_partie_info_t* info = (server_partie_info_t*) arg;
     int nb_joueur = info->nb_joueur;
@@ -649,18 +886,68 @@ void* serv2(void* args){
         joueurs[i] = -1;
     }
     
+    char buffer[READ_SIZE];
     //on attend les connections des joueurs
     while(nb_joueur_connecte < nb_joueur && (clientfd = accept(listenfd, &clientaddr, &clientlen)) > 0){
+        clear_buffer(buffer, READ_SIZE);
         printf("[Serveur]: Nouvelle connection\n");
         //traitement de la connexion
-        write_log(clientfd, "who\n", 4, true);
-        char buffer[READ_SIZE];
-        int n = read(clientfd, buffer, READ_SIZE); //on demande numéro du joueur
-        int num_joueur = atoi(buffer);
-        printf("[Serveur] recoit le numero du joueur: %d\n", num_joueur);
-        joueurs[num_joueur] = clientfd;
-        nb_joueur_connecte++;
+        commande_t* cmd = send_cmd("who", -1, true, 0);
+        char* str = cmd_to_str(cmd);
+        write(clientfd, str, strlen(str));
+        read(clientfd, buffer, READ_SIZE);
+        commande_t* res = str_to_cmd(buffer);
+        if(strcmp(res->cmd, "im") == 0 && res->id >= -1 && res->id < nb_joueur){
+            joueurs[res->id] = clientfd;
+            nb_joueur_connecte++;
+            printf("Joueur %d connecté\n", res->id);
+        }
+        free_cmd(res);
+        free(str);
+        free_cmd(cmd);
     }
+
+    printf("[Serveur]: Tous les joueurs sont connectés\n");
+
+    for(int i=0; i < nb_joueur; i++){
+        char buffer_nb_herisson[32];
+        clear_buffer(buffer_nb_herisson, 32);
+        int_to_ascii(nb_herisson_par_joueur, buffer_nb_herisson);
+        char buffer_nb_lignes[32];
+        clear_buffer(buffer_nb_lignes, 32);
+        int_to_ascii(NB_LIGNES, buffer_nb_lignes);
+
+        commande_t* cmd = send_cmd("all_players_ok", -1, true, 2, buffer_nb_herisson, buffer_nb_lignes);
+        char* str = cmd_to_str(cmd);
+        write(joueurs[i], str, strlen(str));
+        printf("ça va bichette ?\n");
+        free_cmd(cmd);
+        free(str);
+
+        printf("Tout le monde va nous envoyer place, on va transmettre %d\n", i);
+
+        char* reponse=calloc(READ_SIZE, sizeof(char));
+        read(joueurs[i], reponse, READ_SIZE);
+        commande_t* res = str_to_cmd(reponse);
+        if(strcmp(res->cmd, "place") == 0){
+            printf("On recoit place et on transmet aux autres: '%s'\n", reponse);
+            for(int j = 0; j < nb_joueur; j++){
+                if(j == i){
+                    continue;
+                }
+                write(joueurs[j], reponse, strlen(reponse));
+            }
+        }
+        free_cmd(res);
+        free(reponse);
+
+    }
+    
+    free(joueurs);
+
+
+
+    return NULL;
 }
 
 
