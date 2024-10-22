@@ -28,10 +28,10 @@ info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
     info_partie_t* info = calloc(1, sizeof(info_partie_t));
     
     int nb_joueurs = -1;
-    printf("Nombre de joueurs (max 27):\n>");
+    printf("Nombre de joueurs (max 26):\n>");
     while((nb_joueurs = readInt(3)) <= 0 || nb_joueurs > 27){ //ici on utilise 2 car on veut un nombre entre 0 et 27
-        printf("Erreur, veuillez indiquer un nombre entre 1 et 27!\n");
-        printf("Nombre de joueurs (max 27):\n>");
+        printf("Erreur, veuillez indiquer un nombre entre 1 et 26!\n");
+        printf("Nombre de joueurs (max 26):\n>");
     }
     printf("Nombre de joueurs: %d\n", nb_joueurs);
 
