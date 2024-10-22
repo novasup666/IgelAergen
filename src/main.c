@@ -368,8 +368,7 @@ info_coup_t* jouer_coup(plateau_t *p, int joueur){
     }
 
 
-    printf("PUTIN DE COUILLASE DE CONNARD DE MERDE %d\n", info->result);
-    
+    // :)    
     return info;
 }
 
@@ -410,30 +409,7 @@ void game_loop(plateau_t *p){
 }
 
 
-
-int __main(){
-    commande_t* c = str_to_cmd("cmd:who\nid:0\n0\nfin");
-    if(c == NULL){
-        printf("Erreur\n");
-        return 1;
-    }
-    printf("cmd: '%s'\n", c->cmd);
-    printf("id: %d\n", c->id);
-    printf("nb_args: %d\n", c->nb_args);
-    for(int i = 0; i < c->nb_args; i++){
-        printf("arg %d: %s\n", i, c->args[i]);
-    }
-
-    char* str = cmd_to_str(c);
-    printf("str: %s\n", str);
-    free(str);
-
-    free_cmd(c);
-
-    return 0;
-}
-
-int main(int argc, char** argv){
+int _main(int argc, char** argv){
     srand(time(NULL)); //initialise le générateur de nombre aléatoire, à appeler une seule fois !
     
     printf("\n\n<<<<<<< < < <  <  Bienvenue dans Igel Aergen  >  > > > >>>>>>>\n\n");
@@ -529,7 +505,7 @@ int main_test(){
     client2(&info_client);
 }
 
-int _main(int argc, char** argv){
+int main(int argc, char** argv){
     int local = atoi(argv[1]);
     if(local){
         return main_test();
