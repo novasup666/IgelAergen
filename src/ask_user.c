@@ -5,6 +5,8 @@
 #include "main.h"
 #include "ask_user.h"
 
+#define PLACEMENT_ALEATOIRE 1
+
 info_placement_herisson_t * demander_placement_herisson(int joueur, int nb_herissons, int nb_lignes){
     info_placement_herisson_t * info = calloc(1, sizeof(info_placement_herisson_t));
     info->joueur = joueur;
@@ -49,10 +51,18 @@ info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
     for(int j = 0; j<nb_joueurs; j++){
         placement_herisson[j] = calloc(nb_herissons_par_joueurs, sizeof(int));
     }
+
     
-    for(int joueur = 0; joueur < nb_joueurs; joueur++){
-        printf("=========================================================\n");
-        
+    if (PLACEMENT_ALEATOIRE){
+        for (int herisson = 0; herisson < nb_herisson_par_joueur; herisson++){
+            for (int joueur = 0; joueur <nb_joueurs; joueur ++){
+                placement_herisson[joueur][herisson] = lancer_de();
+            }
+        }
+    }
+    else{
+        for(int joueur = 0; joueur < nb_joueurs; joueur++){
+            printf("=========================================================\n");
             info_placement_herisson_t * info_herisson = demander_placement_herisson(joueur, nb_herissons_par_joueurs, nb_lignes);
             for(int herisson = 0; herisson < nb_herissons_par_joueurs; herisson++){
                 placement_herisson[joueur][herisson] = info_herisson->lignes[herisson];
@@ -60,6 +70,7 @@ info_partie_t* demander_info_partie(int nb_lignes, int nb_colonnes){
             free(info_herisson->lignes);
             free(info_herisson);
         }
+    }
 
     info->nb_joueurs = nb_joueurs;
     info->nb_herissons_par_joueurs = nb_herissons_par_joueurs;
