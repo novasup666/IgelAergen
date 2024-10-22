@@ -16,6 +16,10 @@ Un client getaddrinfo(), il obtient un socket, il se connecte et utilise recv() 
 char* hostname = "localhost";
 FILE* log_file = NULL;
 
+
+
+
+
 int calc_size(int n){
     int size = 0;
     while(n > 0){
@@ -116,19 +120,19 @@ void * serveur(void* arg){
     for(int j = 0; j < nb_joueur; j++){
         write_log(joueurs[j], "place\n", 6, true);
         char buffer[READ_SIZE];
-        char num_joueur[READ_SIZE];
-        clear_buffer(num_joueur, READ_SIZE);
         clear_buffer(buffer, READ_SIZE);
-        int taille_num_joueur = int_to_ascii(j, num_joueur);
-        strcpy(buffer, num_joueur);
-        int n = read(joueurs[j], buffer+taille_num_joueur, READ_SIZE);
+        int n = read(joueurs[j], buffer, nb_herisson_par_joueur*2+2); //+2 car au plus 27 joueurs
+        printf("[Serveur] recoit placement de %d de valeur '%s' et de taille %d\n", j, buffer, n);
+
+        char* placed_info = calloc(READ_SIZE, sizeof(char));
+        strcpy(placed_info, "placed\n");
+        strcat(placed_info, buffer);
         for(int other_j = 0; other_j < nb_joueur; other_j++){
-                if(other_j == j){
-                    continue;
-                }
-                printf("[Serveur] envoie placement à %d\n", other_j);
-                write_log(joueurs[other_j], "placed\n", 7, true);
-                write_log(joueurs[other_j], buffer, n+taille_num_joueur, true);
+            if(other_j == j){
+                continue;
+            }
+            printf("[Serveur] envoie placement à %d de valeur '%s'\n", other_j, buffer);
+            write_log(joueurs[other_j], placed_info, nb_herisson_par_joueur*2+2, true);
         }
     }
 
@@ -232,15 +236,15 @@ info_placement_herisson_t* servinfo_to_placement_herisson(char* serv, int nb_her
         char* buffer = malloc(sizeof(char)*(next+1));
         strncpy(buffer, serv+index, next);
         buffer[next] = '\0';
-        printf("buffer: %s\n\n\n", buffer);
         lignes[index_placement] = atoi(buffer);
         free(buffer);
         index += next+1;
         index_placement++;
     }
     printf("servtoco\n");
+    printf("Joueur %d avec %d herissons\n", joueur, nb_herissons);
     for(int i = 0; i < nb_herissons; i++){
-        printf("ligne %d\n", lignes[i]);
+        printf("Ligne %d: %d\n",i, lignes[i]);
     }
     res->lignes = lignes;
     return res;
@@ -334,6 +338,25 @@ info_coup_t* convertir_en_coup(char* serv){
     return res;
 }
 
+bool strstart(char* str, char* start){
+    int i = 0;
+    while(start[i] != '\0'){
+        if(str[i] != start[i]){
+            return false;
+        }
+        i++;
+    }
+    return true;
+}
+
+char* getarg(char* str, char sep){
+    int index = lookup(str, sep);
+    char* res = malloc(sizeof(char)*(index+1));
+    strncpy(res, str, index+1);
+    res[index] = '\0';
+    return res;
+}
+
 void* client(void* arg){
     client_partie_info_t* info = (client_partie_info_t*) arg;
     int nb_joueur = info->nb_joueur;
@@ -358,14 +381,18 @@ void* client(void* arg){
     }
 
     bool fini = false;
+    char buffer[64];
+    clear_buffer(buffer, 64);
+    int n = 0;
     while(!fini){
-        char buffer[64];
         clear_buffer(buffer, 64);
-        int n = read(clientfd, buffer, 64);
-
+        n = read(clientfd, buffer, 64);
+        while(1){
+        
         if(buffer == NULL){
             printf("Erreur lors de la lecture du buffer, CETTE ERREUR EST NORMALEMENT IMPOSSIBLE !\n");
-            continue;
+            break;
+            //continue;
         }
 
         if(buffer[0]=='\0' && !buffer_vide_anonce){
@@ -381,13 +408,13 @@ void* client(void* arg){
             player_number[s] = '\0';
             write_log(clientfd, player_number, s, false);
             free(player_number);
-            continue;
+            //continue;
         }
 
         if(strcmp(buffer, "all_players_ok\n") == 0){
             printf("[Client] reçoit all_players_ok\n");
             //on a tous les joueurs, on peut commencer à placer les pions
-            continue;
+            //continue;
         }   
 
         if(strcmp(buffer, "place\n") == 0){
@@ -398,6 +425,7 @@ void* client(void* arg){
             
             
             //envoyer x1&x2&...&n pour placer les pions
+
             char * placement = placement_herisson_to_serv_infoi(placement_herisson);
             printf("On va envoyer '%s' car on a %d %d %d\n", placement, placement_herisson->joueur, placement_herisson->lignes[0], placement_herisson->lignes[1]);
 
@@ -412,10 +440,14 @@ void* client(void* arg){
             free(placement);
             
             board_print(p);
-            continue;
+            //continue;
         }
 
         if(strcmp(buffer, "placed\n") == 0){
+            char* args = getarg(buffer, '\n');
+            strcpy(buffer, args);
+            free(args);
+
             printf("[Client] recoit placed:\n");
             //reçoit joueur&x1&x2&... et les place sur le plateau
             char buffer2[32];
@@ -424,7 +456,7 @@ void* client(void* arg){
             printf("[Client] placed arg: %s\n", buffer2);
             info_placement_herisson_t * placement_herisson = servinfo_to_placement_herisson(buffer2, nb_herisson_par_joueur, joueur);
 
-
+            printf("On recoit %d %d %d\n", placement_herisson->joueur, placement_herisson->lignes[0], placement_herisson->lignes[1]);
             for(int h=0; h<placement_herisson->nb_herissons; h++){
                 board_push(p, placement_herisson->lignes[h], 0, player_to_herisson(placement_herisson->joueur));
             }
@@ -432,7 +464,7 @@ void* client(void* arg){
             free(placement_herisson->lignes);
             free(placement_herisson);
 
-            continue;
+            //continue;
         }
 
 
@@ -453,7 +485,7 @@ void* client(void* arg){
             char* coup = formatter_coup(info);
             write(clientfd, coup, strlen(coup));
             free(coup);
-            continue;
+            //continue;
         }
 
         if(strcmp(buffer, "move\n") == 0){
@@ -486,7 +518,7 @@ void* client(void* arg){
             free(coup->coo_vert);
             free(coup);
 
-            continue;
+            //continue;
         }
 
         if(strcmp(buffer, "win\n") == 0){
@@ -496,14 +528,20 @@ void* client(void* arg){
             break;
         }
 
-        printf("[Client] recoit '%s' qui sera ignoré \n", buffer);
-        printf("Buffer 0: '%c'\n", buffer[0]);
-       /* char** res = cut(buffer, '\n');
-        free(res[0]);
-        strcpy(buffer, res[1]);
-        free(res[1]);
-        free(res);*/
+        printf("[Client] recoit une commande non reconnu: '%s' \n", buffer);
 
+
+        //on essaye de voir si on a pas reçu plusieurs commandes en même temps:
+        int index = lookup(buffer, '\n');
+        if(index == -1){
+            printf("Erreur, buffer non reconnu: %s\n", buffer);
+            break;
+        }
+        strncpy(buffer, buffer+index+1, 64-index);
+        printf("nouveau buffer: %s\n", buffer);
+
+        }
+    //on relit une nouvelle commande
     }
 
 
@@ -514,6 +552,369 @@ void* client(void* arg){
     return NULL;
 }
 
+
+bool accepte_new_player(int* joueurs, int nb_joueur, int new_player){
+    for(int i = 0; i < nb_joueur; i++){
+        if(joueurs[i] == -1){
+            joueurs[i] = new_player;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+
+commande_t* str_to_cmd(char* buffer){
+    //on lit la commande de la forme cmd:[nom]\nid:[-1 pour server/num_joueur]\n[nb_args]\n[arg1]\n[arg2]\n...\nfin
+    commande_t* res = malloc(sizeof(commande_t));
+    int index = 0;
+    if(buffer[index] != 'c' || buffer[index+1] != 'm' || buffer[index+2] != 'd' || buffer[index+3] != ':'){
+        printf("Erreur, commande mal formée:\n");
+        printf("buffer: %s\n", buffer);
+        printf("========\n");
+        return NULL;
+    }
+    index += 4;
+    int name_size = lookup(buffer+index, '\n');
+    char* name = malloc(sizeof(char)*(name_size+1));
+    strncpy(name, buffer+index, name_size);
+    name[name_size] = '\0';
+    res->cmd = name;
+
+
+    index += name_size+1;
+    if(buffer[index] != 'i' || buffer[index+1] != 'd' || buffer[index+2] != ':'){
+        printf("Erreur, id mal formé\n");
+        return NULL;
+    }
+    index += 3;
+    int id_size = lookup(buffer+index, '\n');
+    char* id = malloc(sizeof(char)*(id_size+1));
+    strncpy(id, buffer+index, id_size);
+    id[id_size] = '\0';
+    res->id = atoi(id);
+    free(id);
+
+    index += id_size;
+    if(buffer[index] != '\n'){
+        printf("Erreur, nb_args mal formé\n");
+        return NULL;
+    }
+    index++;
+    int nb_args_size = lookup(buffer+index, '\n');
+    char* nb_args = malloc(sizeof(char)*(nb_args_size+1));
+    strncpy(nb_args, buffer+index, nb_args_size);
+    nb_args[nb_args_size] = '\0';
+    res->nb_args = atoi(nb_args);
+    free(nb_args);
+
+    index += nb_args_size+1;
+    res->args = malloc(sizeof(char*)*res->nb_args);
+    for(int i = 0; i < res->nb_args; i++){
+        int arg_size = lookup(buffer+index, '\n');
+        char* arg = malloc(sizeof(char)*(arg_size+1));
+        strncpy(arg, buffer+index, arg_size);
+        arg[arg_size] = '\0';
+        res->args[i] = arg;
+        index += arg_size+1;
+    }
+
+    res->is_cmd = true;
+    res->auto_instancie = false;
+    return res;
+}
+
+//TODO regler le pb des commande auto instancié qui ne sont pas free
+//Pour l'instant on ignore la memleak
+void free_cmd(commande_t* cmd){
+    if(!cmd->auto_instancie){
+        free(cmd->cmd);
+        for(int i = 0; i < cmd->nb_args; i++){
+        free(cmd->args[i]);
+        }
+    }
+    free(cmd->args);
+    free(cmd);
+}
+
+char* cmd_to_str(commande_t *cmd){
+    char* res = calloc(128, sizeof(char));
+    int index = 0;
+    strcpy(res, "cmd:");
+    index += 4;
+    strcpy(res+index, cmd->cmd);
+    int taille_cmd = strlen(cmd->cmd);
+    strcpy(res+index+taille_cmd, "\n");
+    index += taille_cmd+1;
+    strcpy(res+index, "id:");
+    index += 3;
+    int signe = 1;
+
+
+    if(cmd->id == -1){
+        strcpy(res+index, "-1");
+        index += 2;
+    }else{
+        //l'id est positif
+        char idbuff[32];
+        int taille_id = int_to_ascii(cmd->id, idbuff);
+        strcpy(res+index, idbuff);
+        index += taille_id;
+    }
+    strcpy(res+index, "\n");
+    index++;
+
+    char numerical_buff[32];
+    clear_buffer(numerical_buff, 32);
+    int nb_arg_size = int_to_ascii(cmd->nb_args, numerical_buff);
+    strcpy(res+index, numerical_buff);
+    index += nb_arg_size;
+    strcpy(res+index, "\n");
+    index++;
+
+    for(int i = 0; i < cmd->nb_args; i++){
+        strcpy(res+index, cmd->args[i]);
+        index += strlen(cmd->args[i]);
+        strcpy(res+index, "\n");
+        index++;
+    }
+    strcpy(res+index, "fin\0");
+    return res;
+}
+
+
+commande_t* answer_who(plateau_t*p, int player, commande_t *c){
+    commande_t* res = malloc(sizeof(commande_t));
+    res->cmd = "im";
+    res->id = player;
+    res->nb_args = 0;
+    res->args = NULL;
+    res->is_cmd = true;
+    return res;
+}
+
+
+
+//source pour l'utilisation de vargs https://medium.com/swlh/variadic-function-in-c-programming-d3632315a48e
+//permet de transformer des arguments en commande_t
+commande_t* send_cmd(char* cmd, int id, bool is_cmd, int nb_args, ...){
+    va_list pargs;
+    va_start(pargs, nb_args);
+    commande_t* res = malloc(sizeof(commande_t));
+    res->cmd = cmd;
+    res->nb_args = nb_args;
+    res->args = malloc(sizeof(char*)*nb_args);
+    for(int i = 0; i < nb_args; i++){
+        res->args[i] = va_arg(pargs, char*);
+    }
+    va_end(pargs);
+    res->id = id;
+    res->is_cmd = is_cmd;
+    res->auto_instancie = true;
+    return res;
+
+}
+
+
+//utiliser par le serveur pour traiter les commandes
+commande_t* handle_cmd(plateau_t *p, int player, commande_t* cmd ){
+    if(cmd == NULL){
+        printf("Handle commande NULL\n");
+        return NULL;
+    }
+    printf("Le joueur %d recoit la commande %s\n", player, cmd->cmd);
+    //TODO utiliser une hashtbl et des pointeurs de fonctions pour éviter les if
+    if(strcmp(cmd->cmd, "who") == 0){
+        printf("On recoit who\n");
+        return send_cmd("im", player, true, 0);
+    }
+    if(strcmp(cmd->cmd, "all_players_ok") == 0){
+        printf("On recoit all_players_ok\n");
+        //on va demander le placement des herissons
+        int nb_herisson_par_joueur = atoi(cmd->args[0]);
+        int nb_lignes = atoi(cmd->args[1]);
+        info_placement_herisson_t * placement_herisson = demander_placement_herisson(player, nb_herisson_par_joueur, nb_lignes);
+        commande_t* res = malloc(sizeof(commande_t));
+        res->cmd = "place";
+        res->id = player;
+        res->nb_args = nb_herisson_par_joueur;
+        res->args = malloc(sizeof(char*)*nb_herisson_par_joueur);
+        for(int i = 0; i < nb_herisson_par_joueur; i++){
+            res->args[i] = malloc(sizeof(char)*3);
+            sprintf(res->args[i], "%d", placement_herisson->lignes[i]);
+        }
+        res->is_cmd = true;
+        return res;
+    }
+
+    printf("Commande non reconnue: '%s'\n", cmd->cmd); 
+
+    return NULL;
+
+    
+
+}
+
+void afficher_cmd(commande_t* cmd){
+    if(cmd == NULL){
+        printf("Commande NULL\n");
+        return;
+    }
+    printf("Commande: %s\n", cmd->cmd);
+    printf("Id: %d\n", cmd->id);
+    printf("Nb args: %d\n", cmd->nb_args);
+    for(int i = 0; i < cmd->nb_args; i++){
+        printf("Arg %d: %s\n", i, cmd->args[i]);
+    }
+}
+
+void* client2(void* arg){
+    client_partie_info_t* info = (client_partie_info_t*) arg;
+    int nb_joueur = info->nb_joueur;
+    int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
+    int joueur = info->joueur;
+    char* port = info->port;
+    char* hostname = info->hostname;
+    info_partie_t* info_partie = info->info;
+
+    plateau_t * p = creer_plateau(NB_LIGNES, NB_COLONNES);
+    int nb_lignes = NB_LIGNES; //ATTENTION: si on modifie la façon de créer le plateau, il faut changer ça
+    int nb_colonnes = NB_COLONNES;
+
+        int clientfd = open_clientfd(hostname, port);
+
+    while(clientfd < 0){
+        printf("Erreur lors de la connexion au serveur, press enter key to retry\n");
+        int c = getchar();
+        clientfd = open_clientfd(hostname, port);
+    }
+    char buffer[READ_SIZE];
+    clear_buffer(buffer, READ_SIZE);
+
+    int n = 0;
+    bool fini = false;
+    while(!fini){
+        int n = read(clientfd, buffer, READ_SIZE);
+        commande_t* cmd = str_to_cmd(buffer);
+        printf("Client recoit commande:\n");
+        afficher_cmd(cmd);
+        commande_t* res = handle_cmd(p, joueur, cmd);
+        printf("Client envoie commande:\n");
+        afficher_cmd(res);
+        fflush(stdout);
+        if(res != NULL & res->is_cmd){
+            char* str = cmd_to_str(res);
+            write(clientfd, str, strlen(str));
+            free(str);
+        }
+
+        //free_cmd(cmd);
+        if(res != NULL){
+            free_cmd(res);
+        }
+
+        printf("FIN DE LA BOUCLE\n");
+
+    }
+    return NULL;
+
+}
+
+//cmd:[nom]id:[-1 pour server/num_joueur]\n[nb_args]\n[arg1]\n[arg2]\n...\nfin
+void* serv2(void* arg){
+     printf("Serveur lancé\n");
+    server_partie_info_t* info = (server_partie_info_t*) arg;
+    int nb_joueur = info->nb_joueur;
+    int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
+    char* port = info->port;
+
+    int listenfd = -1;
+    int clientfd = -1;
+    listenfd = open_listenfd(port);
+    while(listenfd < 0){
+        printf("[SERVER] FATAL ! Erreur lors de l'ouverture du socket d'écoute, press enter to retry\n");
+        getchar();
+        listenfd = open_listenfd(port);
+        //exit(-1);
+        //return NULL;
+    }
+
+    printf("Serveur en attente de connexion\n");
+    int nb_connect = 0;
+    socklen_t clientlen;
+    struct sockaddr_storage clientaddr;
+
+    int nb_joueur_connecte = 0;
+    int* joueurs = malloc(sizeof(int) * nb_joueur);
+    for(int i = 0; i < nb_joueur; i++){
+        joueurs[i] = -1;
+    }
+    
+    char buffer[READ_SIZE];
+    //on attend les connections des joueurs
+    while(nb_joueur_connecte < nb_joueur && (clientfd = accept(listenfd, &clientaddr, &clientlen)) > 0){
+        clear_buffer(buffer, READ_SIZE);
+        printf("[Serveur]: Nouvelle connection\n");
+        //traitement de la connexion
+        commande_t* cmd = send_cmd("who", -1, true, 0);
+        char* str = cmd_to_str(cmd);
+        write(clientfd, str, strlen(str));
+        read(clientfd, buffer, READ_SIZE);
+        commande_t* res = str_to_cmd(buffer);
+        if(strcmp(res->cmd, "im") == 0 && res->id >= -1 && res->id < nb_joueur){
+            joueurs[res->id] = clientfd;
+            nb_joueur_connecte++;
+            printf("Joueur %d connecté\n", res->id);
+        }
+        free_cmd(res);
+        free(str);
+        free_cmd(cmd);
+    }
+
+    printf("[Serveur]: Tous les joueurs sont connectés\n");
+
+    for(int i=0; i < nb_joueur; i++){
+        char buffer_nb_herisson[32];
+        clear_buffer(buffer_nb_herisson, 32);
+        int_to_ascii(nb_herisson_par_joueur, buffer_nb_herisson);
+        char buffer_nb_lignes[32];
+        clear_buffer(buffer_nb_lignes, 32);
+        int_to_ascii(NB_LIGNES, buffer_nb_lignes);
+
+        commande_t* cmd = send_cmd("all_players_ok", -1, true, 2, buffer_nb_herisson, buffer_nb_lignes);
+        char* str = cmd_to_str(cmd);
+        write(joueurs[i], str, strlen(str));
+        printf("ça va bichette ?\n");
+        free_cmd(cmd);
+        free(str);
+
+        printf("Tout le monde va nous envoyer place, on va transmettre %d\n", i);
+
+        char* reponse=calloc(READ_SIZE, sizeof(char));
+        read(joueurs[i], reponse, READ_SIZE);
+        commande_t* res = str_to_cmd(reponse);
+        if(strcmp(res->cmd, "place") == 0){
+            printf("On recoit place et on transmet aux autres: '%s'\n", reponse);
+            for(int j = 0; j < nb_joueur; j++){
+                if(j == i){
+                    continue;
+                }
+                write(joueurs[j], reponse, strlen(reponse));
+            }
+        }
+        free_cmd(res);
+        free(reponse);
+
+    }
+    
+    free(joueurs);
+
+
+
+    return NULL;
+}
 
 
 

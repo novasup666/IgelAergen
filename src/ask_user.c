@@ -6,15 +6,14 @@
 #include "ask_user.h"
 
 info_placement_herisson_t * demander_placement_herisson(int joueur, int nb_herissons, int nb_lignes){
-    info_placement_herisson_t * info = malloc(sizeof(info_placement_herisson_t));
+    info_placement_herisson_t * info = calloc(1, sizeof(info_placement_herisson_t));
     info->joueur = joueur;
     info->nb_herissons = nb_herissons;
-    info->lignes = malloc(nb_herissons*sizeof(int));
+    info->lignes = calloc(nb_herissons, sizeof(int));
     printf("Joueur %d, vous allez placer vos herissons de depart !\n", joueur);
     for(int i = 0; i<nb_herissons; i++){
         printf("Placer le herisson %d:\n>", i);
         int c = -1;
-        fflush(stdout);
         while((c=readInt(TAILLE_MAX_ENTIER)) <0 || c >= nb_lignes){
             printf("Erreur, joueur %d, veuillez indiquer un nombre entre 0 et %d !\n", joueur, nb_lignes-1);
             printf("Placer le herisson %d:\n>", i);
