@@ -69,8 +69,8 @@ Ainsi cette extension fait intervenir 2 composantes imprévues pour le projet: l
 
 2. Phase de jeu
     - à chaque tour, le serveur envoie `"play"` au joueur concerné.
-    - celui-ci repond avec un message décrivant son coup avec une commande `"move"`.
-    - le serveur propage ce coup aux autres joueurs avec une commande `"move"`.
+    - celui-ci repond avec un message décrivant son coup avec une commande `"moved"`.
+    - le serveur propage ce coup aux autres joueurs avec une commande `"moved"`.
     - un fois qu'un client a gagné, il propage une commande `"exit"`.
 
 Un commande correspond au type suivant:
@@ -92,7 +92,7 @@ Petite explication des champs:
 - `id`  indique le joueur concerné par la commande (si c'est un message du serveur comme `"all_player_ok"` : -1)
 - `nb_args` indique la taille de `args`.
 - `auto_instancie` indique si les strings fournit ensuite sont sur la pile ou le tas, permettant de savoir si elles doivent être libérées ou non.
-- `cmd` indique le type de la commande parmis (`"who"`,`"im"`,`"all_player_ok"`,`"place"`,`"placed"`,`"start"`, `"play"`, `"move"`, `"exit"`)
+- `cmd` indique le type de la commande parmis (`"who"`,`"im"`,`"all_player_ok"`,`"place"`,`"placed"`,`"start"`, `"play"`, `"moved"`, `"exit"`)
 - `args` contient des informations complémentaires à la commande (exemple, les lignes dans lesquelles sont initialement placés les hérissons d'un joueur, dans le cadre d'une commande `"placed"`)
 
 
@@ -105,11 +105,13 @@ Le joueur 0 place des hérissons aux lignes 0, 4 et 5.
     commande_t c = {true; 0; 3; false; "placed"; {0,4,5}};
 ```
 
-## V. Conclusion
+## V. Synthèse
+
+Remarquons tout d'abord que tout les modes de jeux fonctionnent comme prévu cependant, certains observations sont nécessaires.
 
 Remarquons tout d'abord le bilan mitigé de l'extension permettant le choix des positions de départ des hérissons. En effet, celle-ci ajoute une lourdeur considérable au jeu sans apporter un grand avantage ludique.
 
-
+De plus l'extension permettant le mode multijoueur en réseau créé un certain nombre de fuites de mémoire dû à l'hétérogénéité des modes d'instanciation des commandes. Une procédure unique et standardisée aurait été préférable mais elle n'a pas été implémentée.
 
 
 ## VI. Bibliographie

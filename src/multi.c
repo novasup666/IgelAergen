@@ -746,7 +746,13 @@ commande_t* handle_cmd(plateau_t *p, int player, commande_t* cmd ){
     if(strcmp(cmd->cmd, "place")==0){
         int nb_herisson_par_joueur = atoi(cmd->args[0]);
         int nb_lignes = atoi(cmd->args[1]);
-        info_placement_herisson_t * placement_herisson = demander_placement_herisson(player, nb_herisson_par_joueur, nb_lignes);
+
+        if(PLACEMENT_ALEATOIRE){
+            info_placement_herisson_t * placement_herisson = 
+        }
+        else{
+            info_placement_herisson_t * placement_herisson = demander_placement_herisson(player, nb_herisson_par_joueur, nb_lignes);
+        }
         commande_t* res = malloc(sizeof(commande_t));
         res->cmd = "placed";
         res->id = player;
@@ -762,6 +768,7 @@ commande_t* handle_cmd(plateau_t *p, int player, commande_t* cmd ){
 
         board_print(p);
         res->is_cmd = true;
+        free(placement_herisson);
         return res;
     }
 
