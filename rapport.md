@@ -122,7 +122,11 @@ Cependant, il y a pire, dans le mode multijoueur, bien que les lignes sur lesque
 Ainsi, le dernier joueur trouvera toujours ses hérissons au dessus de ceux des autres (tout les hérissons du joueur 0, tout ceux du joueur 1, etc..). 
 Une implémentation centralisée, utilisant des permutations tirées au hasard, aurait été préférable mais n'a pas été mise en place.
 
-De plus l'extension permettant le mode multijoueur en réseau créé un certain nombre de fuites de mémoire dû à l'hétérogénéité des modes d'instanciation des commandes. Une procédure unique et standardisée aurait été préférable mais elle n'a pas été implémentée.
+De plus l'extension permettant le mode multijoueur en réseau est assez instable (à cause de problêmes de concurrence et de lecture de buffers).
+
+À l'avenir, on pourra utiliser un thread par client afin de stabiliser l'exectution du serveur.
+
+De plus, l'échange de commandes créé un certain nombre de fuites de mémoire dû à l'hétérogénéité des modes d'instanciation des commandes. Une procédure unique et standardisée aurait été préférable mais elle n'a pas été implémentée.
 
 
 ## VI. Bibliographie

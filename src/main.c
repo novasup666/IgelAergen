@@ -269,8 +269,7 @@ bool is_coup_possible(plateau_t* p, int ligne){
 //-1 si il joue et que aucun herisson arrive sur la dernière colonne
 //player si le herisson de player arrive sur la dernière colonne
 info_coup_t* jouer_coup(plateau_t *p, int joueur){
-    printf("DEBUG: joueur %d\n", joueur);
-    int de = lancer_de();
+     int de = lancer_de();
     //TODO remove ce fix hideux
     while(de >= p->nb_lignes){
         printf("Erreur, le dé a donné un nombre trop grand (%d) pour le nombre de lignes (%d)\n\n", de, p->nb_lignes);
@@ -409,7 +408,7 @@ void game_loop(plateau_t *p){
 }
 
 
-int _main(int argc, char** argv){
+int main(int argc, char** argv){
     srand(time(NULL)); //initialise le générateur de nombre aléatoire, à appeler une seule fois !
     
     printf("\n\n<<<<<<< < < <  <  Bienvenue dans Igel Aergen  >  > > > >>>>>>>\n\n");
@@ -436,9 +435,9 @@ int _main(int argc, char** argv){
     else{
         printf("\n\n<<<<<<< < < <  <  Vous avez choisi le mode multi  >  > > > >>>>>>>\n\n");
         printf("Entrez le nombre de joueurs:\n>");
-        int nb_joueurs = readInt(2);
+        int nb_joueurs = readInt(3);
         printf("Entrez le nombre d'hérissons par joueurs:\n>");
-        int nb_herissons_par_joueurs = readInt(2);
+        int nb_herissons_par_joueurs = readInt(3);
         printf("Entrez le port de communication utilisé:\n>");
         int port_int = readInt(5);
         printf("Le port est %d\n", port_int);
@@ -495,39 +494,3 @@ int _main(int argc, char** argv){
 }
 
 
-int main_test(){
-    client_partie_info_t info_client;
-    info_client.nb_joueur = 2;
-    info_client.nb_herisson_par_joueur = 1;
-    info_client.joueur = 1;
-    info_client.port = "8080";
-    info_client.hostname = "localhost";
-    client2(&info_client);
-}
-
-int main(int argc, char** argv){
-    int local = atoi(argv[1]);
-    if(local){
-        return main_test();
-    }
-    server_partie_info_t info;
-    info.nb_joueur = 2;
-    info.nb_herisson_par_joueur = 1;
-    info.port = "8080";
-
-    client_partie_info_t info_client;
-    info_client.nb_joueur = 2;
-    info_client.nb_herisson_par_joueur = 1;
-    info_client.joueur = 0;
-    info_client.port = "8080";
-    info_client.hostname = "localhost";
-
-    pthread_t c, serv;
-    printf("On lance le thread serveur: \n");
-    pthread_create(&serv, NULL, serv2, &info);
-    printf("On lance le thread client: \n");
-    client2(&info_client);
-    pthread_join(serv, NULL);
-    //close(c);
-    return 0;
-}

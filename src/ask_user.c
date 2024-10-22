@@ -108,9 +108,7 @@ int demander_coo_plateau(int joueur, int max, bool is_ligne, bool mandatory){
 }
 
 //TODO
-bool exists_herisson_deplaceable(plateau_t *p, int joueur, int de){
 
-}
 
 
 

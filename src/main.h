@@ -11,7 +11,7 @@
 #define NB_LIGNES 6
 #define NB_COLONNES 9
 
-#define PLACEMENT_ALEATOIRE 1
+#define PLACEMENT_ALEATOIRE 0
 
 
 int lancer_de(void);

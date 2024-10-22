@@ -19,7 +19,6 @@ FILE* log_file = NULL;
 
 
 
-
 int calc_size(int n){
     int size = 0;
     while(n > 0){
@@ -107,7 +106,6 @@ commande_t* str_to_cmd(char* buffer){
     if(buffer == NULL){
         return NULL;
     }
-    printf("str to cmd: '%s'\n", buffer);
     int index = 0;
     if(strlen(buffer)<4 || buffer[index] != 'c' || buffer[index+1] != 'm' || buffer[index+2] != 'd' || buffer[index+3] != ':'){
         //printf("Erreur, commande mal formée:\n");
@@ -281,20 +279,18 @@ commande_t* handle_cmd(plateau_t *p, int player, int* player_scores, commande_t*
     if(strcmp(cmd->cmd, "place")==0){
         int nb_herisson_par_joueur = atoi(cmd->args[0]);
         int nb_lignes = atoi(cmd->args[1]);
-
+        //printf("Vous allez placer vos hérisson, pressez entrée");
+        getchar();
+        info_placement_herisson_t * placement_herisson = (PLACEMENT_ALEATOIRE ? malloc(sizeof(info_placement_herisson_t)): demander_placement_herisson(player, nb_herisson_par_joueur, nb_lignes));
         if(PLACEMENT_ALEATOIRE){
-
-            info_placement_herisson_t * placement_herisson = malloc(sizeof(info_placement_herisson_t));
-            int * lignes = malloc(nb_herissons_par_joueur * sizeof(int));
-            for (int i = 0; i < nb_herissons_par_joueurs; i++){
-                lignes[i] = lancer_de ();
+            int * lignes = malloc(nb_herisson_par_joueur * sizeof(int));
+            for (int i = 0; i < nb_herisson_par_joueur; i++){
+                lignes[i] = lancer_de();
             }
             placement_herisson->joueur = player;
-            placement_herisson->nb_herissons = nb_herissons_par_joueurs;
+            placement_herisson->nb_herissons = nb_herisson_par_joueur;
         }
-        else{
-            info_placement_herisson_t * placement_herisson = demander_placement_herisson(player, nb_herisson_par_joueur, nb_lignes);
-        }
+
         commande_t* res = malloc(sizeof(commande_t));
         res->cmd = "placed";
         res->id = player;
@@ -350,7 +346,6 @@ commande_t* handle_cmd(plateau_t *p, int player, int* player_scores, commande_t*
             int_to_ascii(info->coo_vert->ligne, vertL);
             int_to_ascii(info->coo_vert->colonne, vertC);
         }
-        printf("On a comme info: res: %d avec comme '%s' '%s'\n", info->result, vertL, vertC);
         commande_t* cmd_play = send_cmd("moved", player, true, 6, resBuff, deBuff, vertBuff, colBuff, vertL, vertC);
         //TODO FREE :c
         return cmd_play;
@@ -419,7 +414,7 @@ void afficher_cmd(commande_t* cmd){
     }
 }
 
-void* client2(void* arg){
+void* client(void* arg){
     client_partie_info_t* info = (client_partie_info_t*) arg;
     int nb_joueur = info->nb_joueur;
     int nb_herisson_par_joueur = info->nb_herisson_par_joueur;
@@ -451,13 +446,9 @@ void* client2(void* arg){
             break;
         }
         commande_t* cmd = str_to_cmd(buffer);
-        printf("Client %d recoit commande:\n", joueur);
-        afficher_cmd(cmd);
-        printf("fin recv.\n");
+       
         commande_t* res = handle_cmd(p, joueur, player_scores, cmd);
-        printf("Client %d envoie commande:\n", joueur);
-        afficher_cmd(res);
-        printf("fin envoie.\n");
+       
         fflush(stdout);
         if(res != NULL && res->is_cmd){
             char* str = cmd_to_str(res);
@@ -483,7 +474,7 @@ void* client2(void* arg){
 }
 
 //cmd:[nom]id:[-1 pour server/num_joueur]\n[nb_args]\n[arg1]\n[arg2]\n...\nfin
-void* serv2(void* arg){
+void* serveur(void* arg){
     printf("Serveur lancé\n");
     server_partie_info_t* info = (server_partie_info_t*) arg;
     int nb_joueur = info->nb_joueur;
@@ -562,6 +553,7 @@ void* serv2(void* arg){
     }
 
     for(int j=0; j<nb_joueur; j++){
+        usleep(500*1000);
 
         char buffer_nb_herisson[32];
         clear_buffer(buffer_nb_herisson, 32);
@@ -570,7 +562,6 @@ void* serv2(void* arg){
         clear_buffer(buffer_nb_lignes, 32);
         int_to_ascii(NB_LIGNES, buffer_nb_lignes);
 
-        printf("Commande place envoye par le serveur au joueur %d\n", j);
         commande_t* cmd = send_cmd("place", -1, true, 2, buffer_nb_herisson, buffer_nb_lignes);
         char* str = cmd_to_str(cmd);
         int size = strlen(str);
@@ -583,16 +574,18 @@ void* serv2(void* arg){
         free(cmd);
         char* reponse=calloc(READ_SIZE, sizeof(char));
         int taille_lu = 0;
-        re_read: //pour eviter un j--; contiune
+        re_read: //pour eviter un j--; continue
         taille_lu += read(joueurs[j], reponse+taille_lu, READ_SIZE-taille_lu);
         commande_t* res = str_to_cmd(reponse);
-        printf("Serveur reçoit réponse: '%s'\n", reponse);
+
+        usleep(500*1000);
+
         if(res != NULL && strcmp(res->cmd, "placed") == 0){
-            printf("On recoit placed et on transmet aux autres: '%s'\n", reponse);
             for(int other_j = 0; other_j < nb_joueur; other_j++){
                 if(j == other_j){
                     continue;
                 }
+
                 write(joueurs[other_j], reponse, strlen(reponse));
             }
         }else{
@@ -603,7 +596,7 @@ void* serv2(void* arg){
 
     }
 
-        usleep(500*1000);
+    usleep(500*1000);
 
 
     commande_t* start = send_cmd("start", -1, true, 0);
@@ -614,49 +607,49 @@ void* serv2(void* arg){
     free(start_str);
     free_cmd(start);
 
-bool is_fini = false;
-int* joueurs_score=calloc(nb_joueur, sizeof(int));
-while(!is_fini){
-for(int j=0; j<nb_joueur; j++){
+    bool is_fini = false;
+    int* joueurs_score=calloc(nb_joueur, sizeof(int));
+    while(!is_fini){
+        for(int j=0; j<nb_joueur; j++){
+            
+            usleep(500*1000);
 
-        printf("Commande play envoye par le serveur au joueur %d\n", j);
-        commande_t* cmd = send_cmd("play", -1, true, 0);
-        char* str = cmd_to_str(cmd);
-        int size = strlen(str);
-        int size_writed = write(joueurs[j], str, size);
-        while(size_writed < size){
-            printf("Erreur: écriture incomplète pour le serveur");
-            size_writed += write(joueurs[j], str+size_writed, size-size_writed);
-        }
-        free(str);
-        free(cmd);
+            commande_t* cmd = send_cmd("play", -1, true, 0);
+            char* str = cmd_to_str(cmd);
+            int size = strlen(str);
+            int size_writed = write(joueurs[j], str, size);
+            while(size_writed < size){
+                printf("Erreur: écriture incomplète pour le serveur");
+                size_writed += write(joueurs[j], str+size_writed, size-size_writed);
+            }
+            free(str);
+            free(cmd);
 
-        char* reponse=calloc(READ_SIZE, sizeof(char));
-        int taille_lu = 0;
-        re_read_mvd: //pour eviter un j--; contiune
-        taille_lu += read(joueurs[j], reponse+taille_lu, READ_SIZE-taille_lu);
-        commande_t* res = str_to_cmd(reponse);
-        printf("Serveur reçoit réponse: '%s'\n", reponse);
-        if(res != NULL && strcmp(res->cmd, "moved") == 0){
-            if(atoi(res->args[0])-2>=0){
-                joueurs_score[atoi(res->args[0])-2]++;
-                if(joueurs_score[atoi(res->args[0])-2] >= nb_herisson_par_joueur-1){
-                    is_fini = true;
+            char* reponse=calloc(READ_SIZE, sizeof(char));
+            int taille_lu = 0;
+            re_read_mvd: //pour eviter un j--; contiune
+            taille_lu += read(joueurs[j], reponse+taille_lu, READ_SIZE-taille_lu);
+            commande_t* res = str_to_cmd(reponse);
+
+            if(res != NULL && strcmp(res->cmd, "moved") == 0){
+                if(atoi(res->args[0])-2>=0){
+                    joueurs_score[atoi(res->args[0])-2]++;
+                    if(joueurs_score[atoi(res->args[0])-2] >= nb_herisson_par_joueur-1){
+                        is_fini = true;
+                    }
                 }
-            }
-            printf("On recoit moved et on transmet aux autres: '%s'\n", reponse);
-            for(int other_j = 0; other_j < nb_joueur; other_j++){
-                if(j == other_j){
-                    continue;
+                for(int other_j = 0; other_j < nb_joueur; other_j++){
+                    if(j == other_j){
+                        continue;
+                    }
+                    write(joueurs[other_j], reponse, strlen(reponse));
                 }
-                write(joueurs[other_j], reponse, strlen(reponse));
+            }else{
+                goto re_read_mvd;
             }
-        }else{
-            goto re_read_mvd;
-        }
-        free_cmd(res);
-        free(reponse);
-    }   
+            free_cmd(res);
+            free(reponse);
+        }   
     }
 
     for(int i = 0; i<nb_joueur; i++){
