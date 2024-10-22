@@ -5,7 +5,6 @@
 #include "main.h"
 #include "ask_user.h"
 
-#define PLACEMENT_ALEATOIRE 1
 
 info_placement_herisson_t * demander_placement_herisson(int joueur, int nb_herissons, int nb_lignes){
     info_placement_herisson_t * info = calloc(1, sizeof(info_placement_herisson_t));

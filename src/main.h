@@ -11,6 +11,9 @@
 #define NB_LIGNES 6
 #define NB_COLONNES 9
 
+#define PLACEMENT_ALEATOIRE 1
+
+
 int lancer_de(void);
 
 char board_top (plateau_t*p, int line, int col);
