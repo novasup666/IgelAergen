@@ -726,7 +726,7 @@ commande_t* send_cmd(char* cmd, int id, bool is_cmd, int nb_args, ...){
 
 
 //utiliser par le serveur pour traiter les commandes
-commande_t* handle_cmd(plateau_t *p, int player, commande_t* cmd ){
+commande_t* handle_cmd(plateau_t *p, int player, int* player_scores, commande_t* cmd ){
     if(cmd == NULL){
         printf("Handle commande NULL\n");
         return NULL;
@@ -802,9 +802,45 @@ commande_t* handle_cmd(plateau_t *p, int player, commande_t* cmd ){
             int_to_ascii(info->coo_vert->colonne, vertC);
         }
         printf("On a comme info: res: %d avec comme '%s' '%s'\n", info->result, vertL, vertC);
-        commande_t* cmd_play = send_cmd("move", player, true, 6, resBuff, deBuff, vertBuff, colBuff, vertL, vertC);
+        commande_t* cmd_play = send_cmd("moved", player, true, 6, resBuff, deBuff, vertBuff, colBuff, vertL, vertC);
         //TODO FREE :c
         return cmd_play;
+    }
+
+    if(strcmp(cmd->cmd, "moved")==0){
+        printf("Joueur %d recoit moved\n", player);
+        int joueur_qui_bouge = cmd->id;
+        int res = atoi(cmd->args[0])-2;
+        int de = atoi(cmd->args[1]);
+        int vert = atoi(cmd->args[2]);
+        int col = atoi(cmd->args[3])-1;
+        int vertL = atoi(cmd->args[4]);
+        int vertC = atoi(cmd->args[5]);
+
+
+        //on joue le coup pour le joueur_qui_bouge
+        if(res >= 0){
+            player_scores[joueur_qui_bouge]++; //TODO verifier win
+        }
+    
+        if(vert){ //1 si haut, 2 si bas
+            int offset = vert == 1 ? -1 : 1;
+            board_push(p, vertL+offset, vertC, board_pop(p, vertL+offset, vert));
+        }
+
+        if(res == -2){
+            printf("Le joueur %d ne peut pas bouger et passe son tours\n", joueur_qui_bouge);
+            return NULL;
+        }
+
+
+        //res==-1 ou player on fait un deplacement 
+        char h = board_pop(p, de, col);
+        board_push(p, de, col+1, h);
+
+        board_print(p);
+
+        return NULL;
     }
 
 
@@ -845,6 +881,7 @@ void* client2(void* arg){
     int nb_lignes = NB_LIGNES; //ATTENTION: si on modifie la façon de créer le plateau, il faut changer ça
     int nb_colonnes = NB_COLONNES;
     int clientfd = open_clientfd(hostname, port);
+    int* player_scores = calloc(nb_joueur, sizeof(int));
 
     while(clientfd < 0){
         printf("Erreur lors de la connexion au serveur, press enter key to retry\n");
@@ -863,7 +900,7 @@ void* client2(void* arg){
         printf("Client %d recoit commande:\n", joueur);
         afficher_cmd(cmd);
         printf("fin recv.\n");
-        commande_t* res = handle_cmd(p, joueur, cmd);
+        commande_t* res = handle_cmd(p, joueur, player_scores, cmd);
         printf("Client %d envoie commande:\n", joueur);
         afficher_cmd(res);
         printf("fin envoie.\n");
